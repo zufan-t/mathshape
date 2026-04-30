@@ -1,0 +1,415 @@
+# 📐 Website Pembelajaran Matematika SMP Kelas 8
+
+Website edukasi interaktif untuk siswa SMP Kelas 8 dengan 3 materi pertemuan, fitur autentikasi, tracking progres belajar, dan sistem sequential learning.
+
+---
+
+## 📋 Ringkasan Kebutuhan (dari prompt.txt)
+
+| Fitur | Detail |
+|:------|:-------|
+| **Target** | Siswa SMP Kelas 8 |
+| **Materi** | 3 pertemuan matematika |
+| **Halaman** | Beranda, About Us, Daftar Materi, Isi Materi, Petunjuk, FAQ & Kontak, Auth |
+| **Auth** | Login, Sign In, Lupa Password, Reset Password |
+| **Progres** | Bar progress per materi, nilai & progres di akun |
+| **Sequential** | Materi terkunci sampai sebelumnya selesai |
+| **Soal** | Halaman selanjutnya terkunci sampai soal diselesaikan |
+| **Responsive** | Desktop, Tablet, Mobile |
+| **Reusable** | Header (3 varian), Footer, Card, Tombol |
+
+---
+
+## 🔬 Analisis Web Stack
+
+### 1. Framework Frontend
+
+| Kriteria | **Vite + React** ⭐ | **Next.js** | **Vite + Vue** |
+|:---------|:-------------------|:-----------|:--------------|
+| Kesesuaian | SPA/Dashboard-oriented — cocok untuk learning platform | Full-stack, SSR-oriented — overkill untuk app ini | Alternatif bagus, tapi kurang familiar |
+| SEO | Landing page bisa di-render statis, sisanya SPA | Built-in SSR/SSG | Sama seperti React |
+| Performa HMR | ⚡ Sangat cepat | Cepat (Turbopack) | ⚡ Sangat cepat |
+| Learning Curve | Sudah familiar (dari project sebelumnya) | Perlu belajar App Router, Server Components | Perlu belajar ekosistem baru |
+| Routing | React Router v7 | Built-in file-based | Vue Router |
+| Hosting | Mudah (Vercel, Netlify, GitHub Pages) | Optimal di Vercel | Mudah |
+
+> [!TIP]
+> **Rekomendasi: Vite + React** — Anda sudah familiar dengan stack ini dari project RobCast sebelumnya. Untuk website tipe learning platform (fokus di area login), Vite + React adalah pilihan optimal.
+
+---
+
+### 2. Styling
+
+| Kriteria | **Tailwind CSS v4** ⭐ | **Vanilla CSS** | **CSS Modules** |
+|:---------|:---------------------|:---------------|:---------------|
+| Produktivitas | Sangat tinggi, utility-first | Fleksibel tapi lambat | Scoped, tapi verbose |
+| Responsive | Built-in breakpoints (`sm:`, `md:`, `lg:`) | Manual media queries | Manual |
+| Konsistensi | Design token bawaan | Harus bikin sendiri | Harus bikin sendiri |
+| Animasi | `animate-*`, `transition-*` | Manual `@keyframes` | Manual |
+| Familiarity | Sudah pernah pakai | — | — |
+
+> [!TIP]
+> **Rekomendasi: Tailwind CSS v4** — Sudah familiar, mempercepat development responsif di 3 device.
+
+---
+
+### 3. Backend & Database (Authentication + Progress Tracking)
+
+| Kriteria | **Supabase** ⭐ | **Firebase** | **Custom (Express + PostgreSQL)** |
+|:---------|:--------------|:-----------|:--------------------------------|
+| Auth | Built-in (email/password, magic link, OAuth) | Built-in (email/password, OAuth) | Harus bangun sendiri |
+| Database | PostgreSQL (relational — cocok untuk relasi user-materi-progress) | Firestore (NoSQL — kurang ideal untuk relasi) | Full control |
+| Real-time | Built-in subscriptions | Built-in listeners | Socket.io |
+| Free Tier | 50K MAU, 500MB DB, 1GB storage | 10K/day auth, 1GB Firestore | Tergantung hosting |
+| Row Level Security | ✅ Built-in RLS | ❌ Firestore rules (kurang fleksibel) | Manual |
+| SQL Support | ✅ Native SQL | ❌ NoSQL only | ✅ |
+| SDK React | `@supabase/supabase-js` + `@supabase/auth-helpers-react` | `firebase/auth`, `firebase/firestore` | Custom hooks |
+
+> [!IMPORTANT]
+> **Rekomendasi: Supabase** — Database relasional (PostgreSQL) sangat cocok untuk tracking progres belajar yang memiliki relasi (user → progress → materi → soal). Free tier sangat generous. Auth built-in mengurangi complexity.
+
+---
+
+### 4. Rendering Matematika
+
+| Kriteria | **KaTeX** ⭐ | **MathJax** |
+|:---------|:-----------|:-----------|
+| Kecepatan | ⚡ Sangat cepat (synchronous) | Lebih lambat (asynchronous) |
+| Ukuran Bundle | ~28KB | ~200KB+ |
+| Fitur | Cukup untuk materi SMP | Lengkap untuk advanced math |
+| React Integration | `react-katex` | `react-mathjax` |
+| Layout Shift | ✅ Tidak ada | ⚠️ Bisa terjadi |
+
+> [!TIP]
+> **Rekomendasi: KaTeX** — Untuk materi SMP Kelas 8, KaTeX lebih dari cukup dan jauh lebih ringan/cepat.
+
+---
+
+### 5. State Management
+
+| Kriteria | **Zustand** ⭐ | **Context API** | **Redux** |
+|:---------|:-------------|:--------------|:---------|
+| Progres tracking | Selective re-render (hemat performa) | Re-render semua consumer | Over-engineered |
+| Boilerplate | Minimal, hook-based | Provider wrapping | Banyak |
+| Ukuran | ~1KB | Built-in | ~7KB |
+| Learning Curve | Mudah | Mudah | Sulit |
+
+> [!TIP]
+> **Rekomendasi: Zustand** untuk client-state (UI, progress cache) + **TanStack Query** untuk server-state (fetch/cache data dari Supabase).
+
+---
+
+### 6. Animasi
+
+| Kriteria | **Motion (Framer Motion)** ⭐ | **GSAP** |
+|:---------|:----------------------------|:--------|
+| React Integration | Native, declarative | Imperative, perlu cleanup |
+| Micro-interactions | ✅ Sangat mudah | ✅ Lebih powerful tapi complex |
+| Scroll animations | `whileInView` | ScrollTrigger plugin |
+| Learning Curve | Rendah untuk React dev | Sedang-tinggi |
+
+> [!TIP]
+> **Rekomendasi: Motion (Framer Motion)** — Declarative API yang natural untuk React, cocok untuk micro-interactions dan transisi halaman.
+
+---
+
+### 7. Library Pendukung Lainnya
+
+| Library | Fungsi |
+|:--------|:-------|
+| **React Router v7** | Client-side routing & protected routes |
+| **React Hook Form + Zod** | Form handling & validasi (login, register, soal) |
+| **Lucide React** | Icon set modern & ringan |
+| **Sonner** | Toast notification (feedback soal, login success) |
+| **Swiper** | Carousel/slider untuk materi |
+
+---
+
+## 🏗️ Final Tech Stack
+
+```
+┌─────────────────────────────────────────────┐
+│                 FRONTEND                     │
+│  Vite + React 19 + TypeScript (✅ Setup)     │
+│  Tailwind CSS v4                             │
+│  React Router v7                             │
+│  Zustand + TanStack Query                    │
+│  Motion (Framer Motion)                      │
+│  KaTeX (render matematika)                   │
+│  React Hook Form + Zod                       │
+│  Lucide React + Sonner                       │
+├─────────────────────────────────────────────┤
+│                 BACKEND                      │
+│  Supabase                                    │
+│  ├── Auth (email/password)                   │
+│  ├── PostgreSQL Database                     │
+│  ├── Row Level Security (RLS)                │
+│  └── Storage (assets materi)                 │
+├─────────────────────────────────────────────┤
+│                 DEPLOY                       │
+│  Vercel / Netlify (Frontend)                 │
+│  Supabase Cloud (Backend)                    │
+└─────────────────────────────────────────────┘
+```
+
+---
+
+## 📁 Struktur Folder
+
+```
+d:\Website\Pengabdian penelitian\
+├── public/
+│   ├── favicon.ico
+│   └── assets/              # Gambar statis, icons
+├── src/
+│   ├── main.tsx             # Entry point
+│   ├── App.tsx              # Root + Router
+│   │
+│   ├── components/          # Komponen Reusable
+│   │   ├── layout/
+│   │   │   ├── Header.tsx          # 3 varian: guest, logged-in, in-materi
+│   │   │   ├── Footer.tsx
+│   │   │   └── Layout.tsx          # Wrapper dengan Header + Footer
+│   │   ├── ui/
+│   │   │   ├── Button.tsx
+│   │   │   ├── Card.tsx
+│   │   │   ├── ProgressBar.tsx
+│   │   │   ├── Modal.tsx
+│   │   │   └── Toast.tsx
+│   │   └── math/
+│   │       └── MathRenderer.tsx   # Wrapper KaTeX
+│   │
+│   ├── pages/
+│   │   ├── home/
+│   │   │   └── HomePage.tsx            # All sections inline
+│   │   ├── about/
+│   │   │   └── AboutPage.tsx
+│   │   ├── materials/
+│   │   │   ├── MaterialListPage.tsx    # Daftar materi + progress bar
+│   │   │   └── MaterialContentPage.tsx # Isi materi per pertemuan
+│   │   ├── guide/
+│   │   │   └── GuidePage.tsx           # Petunjuk & alur penggunaan
+│   │   ├── faq/
+│   │   │   └── FAQPage.tsx             # FAQ + kontak
+│   │   └── auth/
+│   │       ├── LoginPage.tsx
+│   │       ├── RegisterPage.tsx
+│   │       ├── ForgotPasswordPage.tsx
+│   │       ├── ResetPasswordPage.tsx
+│   │       └── PasswordChangedPage.tsx
+│   │
+│   ├── features/             # Business logic per fitur
+│   │   ├── auth/
+│   │   │   ├── useAuth.ts           # Hook auth
+│   │   │   ├── AuthProvider.tsx     # Context provider
+│   │   │   └── ProtectedRoute.tsx   # Route guard
+│   │   └── progress/
+│   │       ├── useProgress.ts       # Hook progress tracking
+│   │       └── progressStore.ts     # Zustand store
+│   │
+│   ├── lib/
+│   │   ├── supabase.ts       # Supabase client init
+│   │   └── constants.ts      # App constants
+│   │
+│   ├── hooks/                # Custom hooks umum
+│   │   └── useMediaQuery.ts
+│   │
+│   ├── data/                 # Data materi (JSON/MDX)
+│   │   ├── materi-1.json
+│   │   ├── materi-2.json
+│   │   └── materi-3.json
+│   │
+│   └── styles/
+│       └── index.css          # Tailwind entry + custom styles
+│
+├── index.html
+├── vite.config.ts
+├── tsconfig.app.json
+├── package.json
+└── .env                       # SUPABASE_URL, SUPABASE_ANON_KEY
+```
+
+---
+
+## 🗄️ Database Schema (Supabase PostgreSQL)
+
+```mermaid
+erDiagram
+    USERS ||--o{ USER_PROGRESS : has
+    MATERIALS ||--o{ MATERIAL_PAGES : contains
+    MATERIALS ||--o{ USER_PROGRESS : tracked_by
+    MATERIAL_PAGES ||--o{ QUESTIONS : may_have
+
+    USERS {
+        uuid id PK
+        string email
+        string full_name
+        string avatar_url
+        timestamp created_at
+    }
+
+    MATERIALS {
+        int id PK
+        string title
+        string description
+        int order_number
+        string thumbnail_url
+        int total_pages
+    }
+
+    MATERIAL_PAGES {
+        int id PK
+        int material_id FK
+        int page_number
+        text content_json
+        boolean has_questions
+    }
+
+    QUESTIONS {
+        int id PK
+        int page_id FK
+        text question_text
+        jsonb options
+        string correct_answer
+    }
+
+    USER_PROGRESS {
+        int id PK
+        uuid user_id FK
+        int material_id FK
+        int current_page
+        int score
+        boolean is_completed
+        timestamp started_at
+        timestamp completed_at
+    }
+```
+
+---
+
+## 🔄 Alur Pengembangan (Fase-fase)
+
+### Fase 1: Foundation & Setup (Hari 1-2)
+- [x] Inisialisasi project Vite + React + TypeScript
+- [x] Setup Tailwind CSS v4
+- [x] Setup React Router v7 dengan semua routes
+- [x] Buat design system (warna, tipografi, spacing)
+- [x] Buat komponen reusable: Button, Card, ProgressBar
+- [x] Buat Layout component (Header + Footer)
+
+### Fase 2: Landing Page & Static Pages (Hari 3-5)
+- [ ] **Beranda/Landing Page**
+  - [ ] Hero Section dengan animasi
+  - [ ] Problem Section (pemantik masalah)
+  - [ ] Solution Section
+  - [ ] Learning Flow Section (timeline/stepper visual)
+  - [ ] Goal Section
+  - [ ] CTA Section
+- [ ] **About Us Page** — profil tim pembuat
+- [ ] **Guide Page** — petunjuk penggunaan
+- [ ] **FAQ Page** — accordion FAQ + info kontak
+
+### Fase 3: Authentication (Hari 6-8)
+- [ ] Setup Supabase project & database
+- [ ] Implementasi halaman Login
+- [ ] Implementasi halaman Register (Sign In)
+- [ ] Implementasi Lupa Password + email reset
+- [ ] Implementasi Reset Password + konfirmasi
+- [ ] Buat ProtectedRoute guard
+- [ ] Header varian: guest vs logged-in
+
+### Fase 4: Materi & Progress System (Hari 9-14)
+- [ ] **Daftar Materi** — card materi dengan progress bar & lock icon
+- [ ] **Isi Materi** — reader per halaman dengan navigasi
+- [ ] Integrasi KaTeX untuk rendering matematika
+- [ ] Sistem soal interaktif (pilihan ganda / isian)
+- [ ] Validasi: halaman selanjutnya terkunci sampai soal selesai
+- [ ] Validasi: materi berikutnya terkunci sampai sebelumnya selesai
+- [ ] Halaman apresiasi setelah menyelesaikan materi
+- [ ] Header varian khusus in-materi
+
+### Fase 5: Progress Tracking & Akun (Hari 15-17)
+- [ ] Zustand store untuk progress client-side
+- [ ] Sync progress ke Supabase
+- [ ] Halaman pengaturan akun (profil, nilai, progres bar)
+- [ ] Progress bar di halaman daftar materi (real-time)
+
+### Fase 6: Polish & Responsive (Hari 18-21)
+- [ ] Responsive testing: Desktop (1440px+)
+- [ ] Responsive testing: Tablet (768px-1024px)
+- [ ] Responsive testing: Mobile (360px-480px)
+- [ ] Animasi & transisi (Motion/Framer Motion)
+- [ ] Loading states & error handling
+- [ ] Toast notifications (Sonner)
+- [ ] Accessibility check
+
+### Fase 7: Testing & Deploy (Hari 22-25)
+- [ ] Testing manual semua alur user
+- [ ] Testing auth flow (register → login → reset password)
+- [ ] Testing progress flow (sequential unlock)
+- [ ] Performance optimization (lazy loading, code splitting)
+- [ ] Deploy frontend ke Vercel/Netlify
+- [ ] Konfigurasi Supabase production
+
+---
+
+## 🧭 Alur User (User Flow)
+
+```mermaid
+flowchart TD
+    A[Buka Website] --> B{Sudah Login?}
+    B -->|Belum| C[Landing Page - Guest View]
+    C --> D[Klik CTA / Login]
+    D --> E{Punya Akun?}
+    E -->|Belum| F[Register/Sign In]
+    E -->|Sudah| G[Login]
+    F --> G
+    G --> H{Lupa Password?}
+    H -->|Ya| I[Masukkan Email] --> J[Cek Email] --> K[Reset Password] --> G
+    H -->|Tidak| L[Dashboard / Beranda - Logged In]
+
+    B -->|Sudah| L
+
+    L --> M[Lihat Daftar Materi]
+    M --> N{Materi Terbuka?}
+    N -->|Terkunci| O[Selesaikan Materi Sebelumnya]
+    N -->|Terbuka| P[Buka Isi Materi]
+
+    P --> Q[Baca Halaman Materi]
+    Q --> R{Ada Soal?}
+    R -->|Ya| S[Kerjakan Soal]
+    S --> T{Jawaban Benar?}
+    T -->|Belum| S
+    T -->|Benar| U[Klik Tombol Selanjutnya]
+    R -->|Tidak| U
+
+    U --> V{Halaman Terakhir?}
+    V -->|Belum| Q
+    V -->|Ya| W[🎉 Apresiasi Selesai Materi]
+    W --> X[Update Progress & Unlock Materi Berikutnya]
+    X --> M
+```
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Beberapa keputusan yang perlu konfirmasi:**
+> 1. **TypeScript vs JavaScript** — Rekomendasi saya TypeScript untuk type safety, tapi jika kurang familiar bisa pakai JavaScript biasa. Mana yang dipilih?
+> 2. **Supabase** — Apakah sudah pernah pakai Supabase? Atau prefer Firebase?
+> 3. **Konten Materi** — Apakah konten materi matematika (teks, rumus, soal) sudah tersedia? Atau perlu dibuat placeholder dulu?
+> 4. **Desain/Mockup** — Apakah ada referensi desain atau warna tema tertentu yang diinginkan? (misalnya: biru pendidikan, hijau segar, dll)
+> 5. **Hosting** — Rencana hosting di mana? Vercel (gratis), Netlify, atau ada preferensi lain?
+
+## Verification Plan
+
+### Automated Tests
+- Jalankan `npm run build` untuk memastikan tidak ada error
+- Testing responsive dengan browser DevTools di 3 breakpoint
+- Lighthouse audit untuk SEO & performance score
+
+### Manual Verification
+- Testing alur lengkap: Register → Login → Buka Materi → Kerjakan Soal → Unlock Materi Selanjutnya
+- Testing di device asli (mobile, tablet) atau browser emulator
+- Testing alur reset password via email

@@ -1,0 +1,38 @@
+1. Tentang website
+Q: Apa itu MathLearn?
+A: MathLearn adalah website pembelajaran matematika interaktif yang dibuat khusus untuk siswa SMP Kelas 8. Website ini menyediakan materi terstruktur, soal latihan, dan tracking progres belajar.
+
+Q: Apakah MathLearn gratis?
+A: Ya, MathLearn sepenuhnya gratis. Anda hanya perlu mendaftar akun untuk mengakses materi dan fitur yang tersedia.
+
+
+
+2. Pendaftaran & Akun
+Q: Bagaimana cara mendaftar akun baru?
+A: Klik tombol "Log in" kemudian pilih menu "Daftar". Anda juga bisa mendaftar secara instan menggunakan akun Google.
+
+Q: Saya lupa kata sandi, bagaimana cara memulihkannya?
+A: Klik "Lupa Password" pada halaman login. Masukkan email Anda, dan kami akan mengirimkan tautan untuk mengatur ulang kata sandi ke kotak masuk (cek folder Spam jika tidak ada).
+
+Q: Apakah saya bisa mengubah alamat email atau nama profil setelah mendaftar?
+A: Anda hanya bisa mengubah nama profil dan kata sandi saja.
+
+
+3. Teknis & Akses Pembelajaran
+Q: Perangkat apa saja yang mendukung untuk mengakses kelas? (Misal: Apakah harus pakai laptop, atau bisa lewat HP?)
+A: Anda dapat mengakses materi melalui browser di PC/Laptop, tab, dan smartphone.
+
+Q: Apakah materi video bisa diunduh untuk ditonton secara offline?
+A: Tidak. Anda tidak bisa mengunduh materi untuk dipelajari secara offline.
+
+Q: Berapa lama masa akses materi setelah membeli?
+A: Kami memberikan akses selamanya. Anda bisa mengulang materi kapan pun meski kursus tersebut telah Anda selesaikan.
+
+Q: Video tidak mau berputar/buffering terus, apa yang harus saya lakukan?
+A: Pastikan koneksi internet stabil, hapus cache browser Anda, atau coba muat ulang halaman.
+
+
+4. Tentang fitur
+Q: Apa yang terjadi kalau nilai kuis saya jelek?
+A: Kamu bisa mengulang kuis kapan saja sampai kamu benar-benar paham materi tersebut. Tidak ada pengurangan nilai untuk pengulangan.
+

@@ -1,0 +1,335 @@
+Font text
+- Heading: Plus Jakarta Sans
+- Body text: Be Vietnam Pro
+
+
+Heading
+- Heading-1: 32 px
+- Heading-2: 28 px
+- Heading-3: 24 px
+- Heading-4: 20 px
+- Heading-5: 16 px
+- Heading-6: 14 px
+
+
+Body text
+- Body text-1: 16 px
+- Body text-2: 14 px
+- Body text-3: 12 px
+- Body text-4: 10 px
+- Body text-5: 8 px
+
+
+
+Color
+- Primary: #007BFF
+- Secondary: #32CD32
+- Tertiary: #9D50BB
+- Neutral: #6C759E
+- Background: #FAFCFF
+- All text: #34393F
+- Footer: #EBF5FF
+
+Backgorund icon
+- Blue:
+  1. #D9ECFF
+- Green:
+  1. #EBF7ED
+- Grey:
+  1. #D3D6E2
+- Yellow:
+  1. #F7FFA1
+- Purple:
+  1. #E49FFF
+- Red:
+  1. #FEDCDC
+
+Color icon
+- Blue: #007BFF
+- Green: #279827
+- Purple: #7C299D
+- Grey: #6C759E
+- Yellow: #DEA30D
+- Red: #B51F29
+
+Button
+> All:
+    - Font and heading: Body text-1
+    - Padding:
+            - top-bottom: 10 px
+            - left-right: 30 px
+    - Shadow: shadow-md
+    - Transition: all duration-300 ease-in-out
+
+> Variation
+    1. First
+    - Color: #Color-primary
+    - Hover: #0266D2
+    - Active: scale-90
+    
+    2. Second (outline)
+    - Color: #FFFFFF
+    - Border color: #000000
+    - Text color: #000000
+    - Hover:
+            - Color: #000000
+            - Text-color: #FFFFFF
+    - Active: scale-90
+
+    3. Third
+    - Color: #57EE57
+    - Hover: #Color-secondary
+    - Active: scale-90
+
+    4. Fourth
+    - Color: #Color-neutral
+    - Hover: opacity-80
+    - Active: scale-90
+
+Library icon
+- Phosphor icon
+* Page:
+  - Beranda
+    - Pemantik
+      - eye-slash 
+        <EyeSlashIcon size={32} />
+
+      - puzzle-piece 
+        <PuzzlePieceIcon size={32} />
+
+      - smiley-sad 
+        <SmileySadIcon size={32} />
+
+    - Solusi
+      - squares-four
+        <SquaresFourIcon size={32} />
+
+     - book-open 
+       <BookOpenIcon size={32} />
+
+     - pencil-square
+       <PencilSquareIcon size={32} />
+
+     - language
+       <LanguageIcon size={32} />
+
+     - check-circle 
+      <CheckCircleIcon size={32} />
+
+    - Alur belajar
+      - hash-straight
+        <HashStraightIcon size={32} />
+    
+      - corners-in
+        <CornersInIcon size={32} />
+    
+      - bounding-box 
+        <BoundingBoxIcon size={32} />
+
+     - brain
+       <BrainIcon size={32} />
+
+    - Tujuan
+      - trend-up 
+        <TrendUpIcon size={32} />
+
+      - number-square-one
+        <NumberSquareOneIcon size={32} />
+
+      - student
+        <StudentIcon size={32} />
+
+      - monitor
+        <MonitorIcon size={32} />
+
+      - chalkboard-teacher
+        <ChalkboardTeacherIcon size={32} />
+
+    - Call To Action
+      - binoculars
+        <BinocularsIcon size={32} />
+
+      - shield-check
+        <ShieldCheckIcon size={32} />
+
+  - Petunjuk
+    - user-plus
+      <UserPlusIcon size={32} weight="fill" />
+
+    - user-check
+      <UserCheckIcon size={32} weight="fill" />
+
+    - book-open 
+      <BookOpenIcon size={32} weight="fill" />
+
+    - lock 
+      <LockIcon size={32} weight="fill" />
+
+    - pencil-square 
+      <NotePencilIcon size={32} weight="fill" />
+
+    - check-circle 
+      <CheckCircleIcon size={32} weight="fill" />
+
+  - Materi 
+    - lock 
+      <LockIcon size={32} weight="fill" />
+
+  - CTA 
+    - shield-check
+      <ShieldCheckIcon size={32} />
+
+  - Akun
+    - eye-closed 
+      <EyeClosedIcon size={32} />
+
+    - eye 
+      <EyeIcon size={32} />
+
+      - Apresiasi
+  - Isi materi
+
+  - Login, sign in, buat kata sandi baru 
+    - eye-closed 
+      <EyeClosedIcon size={32} />
+
+    - eye 
+      <EyeIcon size={32} />
+
+  - Apresiasi
+    - medal 
+      <MedalIcon size={32} />
+
+  - Isi materi 
+    - arrow-left 
+      <ArrowLeftIcon size={32} />
+
+* Component
+
+
+
+Library icon
+- Hero icon
+* Page:
+  - Beranda
+    - Pemantik
+    - Solusi
+    - Alur belajar
+    - Tujuan
+      - rocket-launch
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.631 8.41m5.96 5.96a14.926 14.926 0 0 1-5.841 2.58m-.119-8.54a6 6 0 0 0-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 0 0-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 0 1-2.448-2.448 14.9 14.9 0 0 1 .06-.312m-2.24 2.39a4.493 4.493 0 0 0-1.757 4.306 4.493 4.493 0 0 0 4.306-1.758M16.5 9a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" />
+        </svg>
+
+
+    - Call To Action
+  - Petunjuk
+  - Akun
+  - Apresiasi
+  - Isi materi
+
+* Component
+  - Navbar mobile
+    - bars-2:
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
+      </svg>
+    - x-mark:
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
+      - user-circle:
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
+        <path fillRule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clipRule="evenodd" />
+      </svg>
+
+
+Button in page/section/components/template 
+> Page 
+  - Beranda
+    - Hero
+      - First 
+
+    - Call To Action 
+      - First 
+      - Second (outline)
+
+  - Frequently Asked Question  
+    - Thrid 
+    - Second 
+
+  - Log in, sign in, atur ulang kata sandi, buat kata sandi baru, kata sandi berhasil diperbarui 
+    - First 
+
+  - Akun
+    - Data diri
+        - First
+        - Fourth
+    - Riwayat belajar 
+      - First 
+
+  - Apresiasi 
+    - Third 
+    - Second 
+    - First 
+
+  - Isi materi
+    - First 
+
+> Components
+  - Navbar
+    - First
+
+
+
+# Component terms
+1. Navbar 
+Container
+- Border: #FFFFFF
+- Full rounded
+- Background: Efek glass
+  - Container 
+    - Gap: space-between  
+      - Container
+        - Nama website
+          - Heading-1
+      - Container
+        - Menu (Container)
+          - Gap: 40 px 
+          - Text: Body text-1
+            - Hover: opacity-90
+            - active: scale-90
+          - Login/user: First
+
+2. Footer
+Container
+- top-right rounded
+- top-left rounded
+  - Nama website: Heading-1
+  - Kontak, Tentang kami, Copyright: Body text-2
+  - Background: #Footer
+
+
+
+
+Link:
+> Page FAQ
+  - Tombol WhatsApp: wa.me/6289504573745
+  - Tombol Email: zufantaufiqurrohman@gmail.com
+
+
+
+
+Page isi materi
+Icon:
+   - <GraduationCapIcon size={32} />
+   - <FlagIcon size={32} />
+   - <ExclamationMarkIcon size={32} />
+   - <CrosshairIcon size={32} />
+   - <MagnifyingGlassIcon size={32} />
+   - <QuestionMarkIcon size={32} />
+   - <YoutubeLogoIcon size={32} />
+   - <SealCheckIcon size={32} />
+
+Button:
+   - First

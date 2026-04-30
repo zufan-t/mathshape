@@ -1,0 +1,311 @@
+saya mau buat website pembelajaran matematika untuk anak smp kelas 8 dengan 3 materi prtemuan. Didalamnya terdapat beberapa page yaitu:
+1. Beranda/Landing page:
+   - Hero 
+   - Pemantik masalah sulitnya belajar matematika
+   - Solusi dari website yang saya buat
+   - Alur belajar yang tersedia di website
+   - Tujuan pembuatan website
+   - Call To Action
+2. About us (orang-orang yang membuat website dan mengembangkan materi)
+3. Daftar materi pembelajaran yang tersedia:
+   Dalam setiap materi memiliki tampilan yang sama, hanya beda isi materi saja
+   - Isi materi
+   - Apresiasi telah menyelesaikan materi
+4. Petunjuk dan alur penggunaan website
+5. Frequently Ask Question dan kontak (nomor dan email)
+6. Login, sign in, masukan email karena lupa kata sandi, ubah kata sandi, email konfirmasi perbaruan kata sandi terkirim, kata sandi baru berhasil diperbarui
+
+Komponen reusable
+a. Header (ketika sudah login, ketika belum login/sign in, ketika didalam isi materi)
+b. Footer
+c. Card tiap section/page
+d. Tombol
+
+Detail lain:
+- Responsive di 3 device (dekstop, tab, mobile)
+- Fitur progres: tiap user yang telah menyelesaikan atau sedang mengerjakan materi akan ada informasi di page materi (bar progress) dan di pengaturan akun (nilai dan bar progres)
+- Materi berikutnya tidak akan kebuka kalau materi sebelumnya belum diselesaikan
+- Dalam page isi materi, halaman selanjutnya belum bisa diakses kalau belum menyelesaikan soalnya (kalau ada soal) dan klik tombol selanjutnya
+
+Prompt 2:
+Oke sekarang gimana caranya aku bisa vibe engineering disini pakai AI untuk membangun tampilan website disini?
+Sedangkan desain tampilan yang sudah saya buat masih ada di figma, dan aku ingin tampilan website yang aku buat nanti sesuai dengan desain yang ada di figma
+
+Prompt 3:
+Footer: 
+atas=dekstop, tengah = tab, bawah, mobile
+
+navbar:
+urutan dari atas kebawah
+1. desktop-user belum login
+2. tab dan mobile-user belum login
+3. tab dan mobile-open-user belum login
+4. desktop-user sudah login
+5. tab dan mobile-user sudah login
+6. tab dan mobile-open-user sudah login
+7. desktop-user login page
+8. tab dan mobile-user login page
+9. tab dan mobile-open-user login page
+10. desktop-user isi materi
+11. tab dan mobile-user isi materi
+12. tab dan mobile-open-user isi materi
+
+
+Prompt 4:
+Teks:
+     - Subjudul: heading-4 (24px)
+     - Deskripsi: Body text-1
+
+Card: 
+     - Judul: Heading-4
+     - Deskripsi: Body text-1
+     - Efek shadow
+     - Efek reveal saat di scroll samakan seperti di kodingan, tapi berulang ulang efeknya ketika scroll naik turun
+
+Icon:
+     - Background: 
+                  - Red (eye-slash)
+                  - Green (puzzle-piece)
+                  - Yellow (smiley-sad)
+     - Icon: 
+            - Red (eye-slash)
+            - Green (puzzle-piece)
+            - Yellow (smiley-sad)
+
+Dekstop: 3 kolom 1 baris 
+Tab dan mobile: 1 kolom 3 baris 
+
+
+Prompt 5:
+Section Alur belajar
+Icon:
+      - Background: 
+                   - Green (Card materi)
+                   - Color primary (otak)
+      - Icon: 
+            - Green (Card materi)
+            - #FFFFFF (otak)
+
+Card:
+     - Materi:
+               - Background: #FFFFFF 
+               - Efek shadow
+               - Garis progres:
+                               - Color primary
+                               - #D3D6E2
+                               - Efek berjalan kayak loading yang mulai awal sampai akhir
+               - Teks:
+                      - PERTEMUAN:
+                                    - Body text-1 bold
+                                    - Color primary
+                      - Judul materi:
+                                      - Heading-3
+                      - Deskripsi: 
+                                  - Body text-1
+
+    - Kognitif:
+               - Background: #D3D6E2
+               - Text:
+                       - Judul: Body text-1 bold
+                       - Deskripsi: Body text-1
+
+Dekstop: 3 kolom 1 baris
+Tab dan mobile: 1 kolom 3 baris
+
+Prompt 6:
+Solusi section 
+Icon:
+      - Backgorund:
+                   - squares-four: Purple
+                   - book-open: Blue
+                   - language: Yellow
+                   - pencil-square: Green
+                   - check-circle: Blue
+         Lampu diganti language
+         3 kotak diganti squares-four 
+
+      - Icon 
+            - squares-four: Purple
+            - book-open: Blue
+            - language: Yellow
+            - pencil-square: Green
+            - check-circle: Blue
+
+      - Text
+            - Judul: Heading-2
+            - Subjudul poin: Body text-1 bold
+            - Deskripsi: Body text-1
+
+
+Prompt 7:
+Goal section
+Icon:
+      - Background: 
+                    - Original (Impact)
+                    - rocket: #A1CAF3
+                    - trend-up: #C4E8CA
+      - Icon:
+             - Original (Impact)
+             - Blue (rocket)
+             - Green (trend-up)
+
+      - Text
+            - Judul: Heading-2
+            - Subjudul poin: Body text-1 bold
+            - Deskripsi: Body text-1
+            - Kata motivasi: Body text-1 italic
+            - Nama tokoh motivasi: Body text-1
+            - Text icon: Body text-1 bold
+
+      Card: 
+           - Background:
+                         - Icon:
+                                 - rocket: Blue
+                                 - trend-up: Green
+                        
+                         - Motivasi: #D3D6E2
+                              
+
+Dekstop tengah, tab kanan, mobile kiri
+
+
+Prompt 8:
+> Section CTA 
+  - Icon: 
+          - Backgorund: Purple
+          - Icon: Purple
+  - Sub-Judul: Heading-2
+  - Deskripsi: Body text-1
+  - Tombol: 
+          - First
+          - Second (outline)
+  - Icon: Backgorund dan icon: original 
+  - Text: Body text-3
+     yang tanda bintang itu diganti dengan titik tengah yang agak besar 
+
+> Page Tentang kami  
+  - Judul: Heading-1
+  - Deskripsi: Body text-1
+  - Card: 
+          - Nama: Heading-4
+          - Program studi: Body text-1
+          - Peran:
+                   - Body text-3
+                   - Background: Background-blue
+                   - Full-rounded 
+
+> Page Panduan
+  - Judul: Heading-1
+  - Semua deskripsi: Body text-1
+  - Angka: 
+          - Backgorund dan warna
+            - 1: Blue
+            - 2: Green
+            - 3: Purple
+            - 4: Yellow
+  - Card icon:
+               - Backgorund dan warna
+                    - user-plus-fill dan user-check-fill: Blue
+                    - book-open-fill dan lock-fill: Green
+                    - pencil-square-fill dan check-circle-fill: Purple
+               - Icon:
+                    - user-plus-fill dan user-check-fill: Blue
+                    - book-open-fill dan lock-fill: Green
+                    - pencil-square-fill dan check-circle-fill: Purple
+
+
+
+Prompt 9:
+> Page FAQ
+  - List pertanyaan ada di file faq.txt
+  - Text:
+          - Judul: Heading-1
+          - Deskripsi: Body text-1
+          - Subjudul pertanyaan: Body text-1 bold
+          - Pertanyaan: Body text-1 bold
+          - Jawaban: Body text-1
+          - Belum menemukan jawaban: Heading-1
+  - Button: 
+            - WhatsApp: Third
+            - Email: Second (outline)
+
+> Page Akun
+  - Section data diri
+      - Judul: Heading-1
+      - Deskripsi: Body text-1
+      - Tombol: 
+                  - Primary
+                  - Fourth 
+
+  - Section progres
+      - Judul: Heading-1
+      - Deskripsi: Body text-1
+      - Card:
+               - Nama kuis: Body text-1
+               - Nilai: Body text-1 bold
+               - Bar progres: sama dengan bar progres di section alur belajar
+
+
+> Apresiasi 
+  - Heading-1
+  - Body text-1
+  - Tombol: Third, Second, First
+
+
+> List materi
+  - Judul: Heading-1
+  - Deskripsi: Body text-1
+  - Card:
+           - Pertemuan: Heading-1 color-primary
+           - Judul materi: Heading-1
+           - progres dan persen: Body text-1
+           - line progres sama dengan bar progres di section alur belajar
+           
+
+
+Prompt 10: 
+Page Isi materi
+1. Sidebar:
+   - Berisi nama pertemuan, urutan sequence dan halaman per sequence, progres keseluruhan, dan tombol "Keluar dari materi" (logo panah kiri)
+   - Body text-1 bold
+   - Menutup atau terbuka ketika di klik
+2. Sequence:
+        - Judul: Heading-1
+        - Capaian dan Tujuan pembelajaran: Heading-4
+        - Big Idea: Heading-2
+        - Essential Question: Heading-2
+        - The Challenge: Heading-4
+        - Guiding Activities: Heading-4
+        - Guiding Questions: Heading-4
+        - Guiding Resources: Heading-4
+          - Video YouTube
+        - Solutions: Heading-4
+        - Warna ikon sama seperti sebelumnya yang ikon berwarna
+
+Each sequence have 1 page, page sebelumnya ada tombol "selesai" kalau sudah selesai otomatis membuka halaman selanjutnya Dan di page sebelumnya ada tombol "Keluar dari materi". Tetap dalam 1 halaman hanya menambah length pagenya saja.
+
+
+
+Prompt 11:
+Page isi materi:
+- Image Big Idea: ada di folder assets dengan masing masing bernama materiSatu, materiDua, materiTiga
+- Sidebar tampilan mobile: dipindah ke navbar, ketika di klik ikon menu ada isi menu yang sebelumnya itu di sidebar. 
+- Buat transisinya mulus ketika di klik selanjutnya, page selanjutnya muncul dibawahnya tapi viewnya tidak ikut ke scroll.
+- Seharusnya sesuai progress yang sudah didapat. Misal kalau sudah 60% maka kalau dia kembali buka materi dia juga langsung ke page yang sebelumnya sudah 60%
+
+Page List materi:
+- Image: diambil dari image Big Idea masing-masing materi
+
+Page Daftar:
+- Form password: beri keterangan di bawah input password apa saja yang harus diinput sesuai ketentuan. Keterangan berupa list, misal - huruf kapital, - huruf kecil, - angka, - simbol (@, #, %, *, ^)
+
+Page verifikasi email terkirim:
+- Tombol Kirim ulang: perbaiki, seharusnya bukan mengarah ke page reset password melainkan sharusnya langsung saja kirim ulang link verifikasi emailnya.
+
+Page apresiasi:
+- Tombol kembali: perbaiki, seharusnya bukan ke halaman utama tetapi mengarah ke halaman list materi. Tulisan tombolnya juga diganti "Ke List Materi".
+- Tombol materi selanjutnya: seharusya langsung masuk materi selanjutnya bukan kembali ke page list materi.
+
+Page akun:
+- Seharusnya disitu tertera semua data dirinya bukan malah kosongan
+- Edit data diri seharusnya ketika klik edit data diri. Jadi tombol yang simpan perubahan itu harusnya 'edit data diri' dulu baru ketika di klik berubah menjadi simpan perubahan. TOmbol Batal seharusnya hanya muncul saat tombol edit di klik.
