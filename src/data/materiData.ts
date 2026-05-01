@@ -103,7 +103,7 @@ export const MATERI_DATA: MateriPertemuan[] = [
       ],
     },
     guidingActivities: [
-      'Akses dan kerjakan lembar aktivitas digital melalui tautan Canva berikut: https://canva.link/qkfj9h32u2vvjt7',
+      'Akses dan kerjakan lembar aktivitas digital melalui tautan Canva berikut: https://drive.google.com/file/d/1aGR-yVDdicqrSFrJzSu4_9BNfYEDNVL8/view?usp=sharing',
       'Amati gambar rangka atap yang tersedia dan identifikasi garis-garis yang ada.',
       'Tandai sudut-sudut yang terbentuk dan tentukan hubungan antar sudut tersebut.',
     ],

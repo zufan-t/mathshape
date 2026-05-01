@@ -53,6 +53,29 @@ function useWindowWidth() {
   return w
 }
 
+function renderTextWithLinks(text: string) {
+  const urlRegex = /((?:https?:\/\/)[^\s]+)/g
+  const parts = text.split(urlRegex)
+
+  return parts.map((part, i) => {
+    if (part.match(urlRegex)) {
+      return (
+        <a
+          key={i}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: '#007BFF', textDecoration: 'underline', wordBreak: 'break-all' }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {part}
+        </a>
+      )
+    }
+    return part
+  })
+}
+
 // ─── Icon Badge ────────────────────────────────────────────────────────────────
 function IconBadge({ children, bg, color }: { children: React.ReactNode; bg: string; color: string }) {
   return (
@@ -263,7 +286,7 @@ export default function MaterialContentPage() {
           <SectionCard key="eq" sectionRef={ref} icon={<IconBadge bg="#D9ECFF" color="#007BFF"><Info size={22} /></IconBadge>} title="Essential Question">
             {m.essentialQuestions.map((q, i) => (
               <p key={i} style={{ margin: i > 0 ? '8px 0 0' : 0 }}>
-                {q}
+                {renderTextWithLinks(q)}
               </p>
             ))}
           </SectionCard>
@@ -271,9 +294,9 @@ export default function MaterialContentPage() {
       case 3:
         return (
           <SectionCard key="challenge" sectionRef={ref} icon={<IconBadge bg="#E49FFF" color="#7C299D"><Crosshair size={22} /></IconBadge>} title="The Challenge">
-            <p style={{ margin: '0 0 12px' }}>{m.theChallenge.deskripsi}</p>
+            <p style={{ margin: '0 0 12px' }}>{renderTextWithLinks(m.theChallenge.deskripsi)}</p>
             <ul style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {m.theChallenge.poin.map((p, i) => <li key={i}>{p}</li>)}
+              {m.theChallenge.poin.map((p, i) => <li key={i}>{renderTextWithLinks(p)}</li>)}
             </ul>
           </SectionCard>
         )
@@ -281,7 +304,7 @@ export default function MaterialContentPage() {
         return (
           <SectionCard key="activities" sectionRef={ref} icon={<IconBadge bg="#F7FFA1" color="#DEA30D"><GraduationCap size={22} /></IconBadge>} title="Guiding Activities">
             <ol style={{ margin: 0, paddingLeft: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {m.guidingActivities.map((a, i) => <li key={i}>{a}</li>)}
+              {m.guidingActivities.map((a, i) => <li key={i}>{renderTextWithLinks(a)}</li>)}
             </ol>
           </SectionCard>
         )
@@ -289,7 +312,7 @@ export default function MaterialContentPage() {
         return (
           <SectionCard key="questions" sectionRef={ref} icon={<IconBadge bg="#F7FFA1" color="#DEA30D"><MagnifyingGlass size={22} /></IconBadge>} title="Guiding Questions">
             <ol style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {m.guidingQuestions.map((q, i) => <li key={i}>{q}</li>)}
+              {m.guidingQuestions.map((q, i) => <li key={i}>{renderTextWithLinks(q)}</li>)}
             </ol>
           </SectionCard>
         )
@@ -315,7 +338,7 @@ export default function MaterialContentPage() {
         return (
           <SectionCard key="solutions" sectionRef={ref} icon={<IconBadge bg="#EBF7ED" color="#279827"><SealCheck size={22} /></IconBadge>} title="Solutions">
             <ul style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {m.solutions.map((s, i) => <li key={i}>{s}</li>)}
+              {m.solutions.map((s, i) => <li key={i}>{renderTextWithLinks(s)}</li>)}
             </ul>
           </SectionCard>
         )
