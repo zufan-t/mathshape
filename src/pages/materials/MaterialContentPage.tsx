@@ -263,7 +263,7 @@ export default function MaterialContentPage() {
           <SectionCard key="eq" sectionRef={ref} icon={<IconBadge bg="#D9ECFF" color="#007BFF"><Info size={22} /></IconBadge>} title="Essential Question">
             {m.essentialQuestions.map((q, i) => (
               <p key={i} style={{ margin: i > 0 ? '8px 0 0' : 0 }}>
-                {m.essentialQuestions.length > 1 && <strong style={{ color: '#34393F' }}>{i + 1}.&nbsp;</strong>}{q}
+                {q}
               </p>
             ))}
           </SectionCard>
@@ -272,7 +272,7 @@ export default function MaterialContentPage() {
         return (
           <SectionCard key="challenge" sectionRef={ref} icon={<IconBadge bg="#E49FFF" color="#7C299D"><Crosshair size={22} /></IconBadge>} title="The Challenge">
             <p style={{ margin: '0 0 12px' }}>{m.theChallenge.deskripsi}</p>
-            <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <ul style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
               {m.theChallenge.poin.map((p, i) => <li key={i}>{p}</li>)}
             </ul>
           </SectionCard>
@@ -280,7 +280,7 @@ export default function MaterialContentPage() {
       case 4:
         return (
           <SectionCard key="activities" sectionRef={ref} icon={<IconBadge bg="#F7FFA1" color="#DEA30D"><GraduationCap size={22} /></IconBadge>} title="Guiding Activities">
-            <ol style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <ol style={{ margin: 0, paddingLeft: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
               {m.guidingActivities.map((a, i) => <li key={i}>{a}</li>)}
             </ol>
           </SectionCard>
@@ -288,7 +288,7 @@ export default function MaterialContentPage() {
       case 5:
         return (
           <SectionCard key="questions" sectionRef={ref} icon={<IconBadge bg="#F7FFA1" color="#DEA30D"><MagnifyingGlass size={22} /></IconBadge>} title="Guiding Questions">
-            <ol style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <ol style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
               {m.guidingQuestions.map((q, i) => <li key={i}>{q}</li>)}
             </ol>
           </SectionCard>
@@ -314,7 +314,7 @@ export default function MaterialContentPage() {
       case 7:
         return (
           <SectionCard key="solutions" sectionRef={ref} icon={<IconBadge bg="#EBF7ED" color="#279827"><SealCheck size={22} /></IconBadge>} title="Solutions">
-            <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <ul style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
               {m.solutions.map((s, i) => <li key={i}>{s}</li>)}
             </ul>
           </SectionCard>

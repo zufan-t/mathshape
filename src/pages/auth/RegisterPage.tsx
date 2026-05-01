@@ -216,7 +216,7 @@ export default function RegisterPage() {
                   const r = validateEmail(email)
                   setEmailError(r.valid ? null : (r.message ?? null))
                 }}
-                placeholder="nama@email.com"
+                placeholder="Masukkan email anda"
                 style={inputStyle(!!emailError)}
                 onFocus={e => { if (!emailError) e.target.style.borderColor = '#007BFF' }}
               />

@@ -175,7 +175,7 @@ export default function LoginPage() {
                 autoComplete="email"
                 value={email}
                 onChange={handleEmailChange}
-                placeholder="nama@email.com"
+                placeholder="Masukkan email anda"
                 style={{
                   width: '100%', padding: '12px 16px', borderRadius: '12px',
                   border: `1.5px solid ${emailError ? '#EF4444' : '#E5E7EB'}`,

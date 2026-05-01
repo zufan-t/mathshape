@@ -3,7 +3,7 @@ import { motion, useInView } from 'framer-motion'
 import najwa from "../../assets/najwa.jpg"
 import salsa from "../../assets/salsa.jpg"
 import rafi from "../../assets/rafi.jpg"
-import zufan from "../../assets/zufan.jpeg"
+import zufan from "../../assets/zufan.jpg"
 
 // ─── Team data ─────────────────────────────────────────────────────────────────
 const teamMembers = [
