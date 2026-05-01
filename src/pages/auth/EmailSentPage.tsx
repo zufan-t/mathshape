@@ -1,31 +1,30 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Envelope, CircleNotch, CheckCircle } from '@phosphor-icons/react'
+import { Link, useLocation } from 'react-router-dom'
+import { Envelope, CircleNotch, CheckCircle, ArrowLeft } from '@phosphor-icons/react'
 import { supabase } from '@/lib/supabase'
+import { ROUTES } from '@/lib/constants'
 
 // ─── Auth Variant 4: Email Terkirim ───────────────────────────────────────────
 export default function EmailSentPage() {
+  const location = useLocation()
+  const { email, type = 'signup' } = (location.state as { email?: string; type?: 'signup' | 'recovery' }) || {}
+  
   const [resending, setResending] = useState(false)
   const [resent, setResent] = useState(false)
   const [resentError, setResentError] = useState<string | null>(null)
 
   const handleResend = async () => {
-    setResending(true)
-    setResentError(null)
-
-    // Ambil email dari session yang sedang aktif (user baru saja daftar tapi belum login)
-    const { data: { session } } = await supabase.auth.getSession()
-    const email = session?.user?.email
-
     if (!email) {
-      // Tidak bisa mendapatkan email — tampilkan pesan generik
-      setResentError('Tidak dapat menemukan sesi. Silakan daftar ulang.')
-      setResending(false)
+      setResentError('Email tidak ditemukan. Silakan ulangi proses dari awal.')
       return
     }
 
+    setResending(true)
+    setResentError(null)
+
     const { error } = await supabase.auth.resend({
-      type: 'signup',
+      type: type as 'signup' | 'signup' | 'invite' | 'magiclink' | 'recovery',
       email,
     })
 
@@ -135,9 +134,33 @@ export default function EmailSentPage() {
           )}
 
           {resentError && (
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: '#EF4444', marginTop: 10 }}>
-              {resentError}
-            </p>
+            <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: '#EF4444', margin: 0 }}>
+                {resentError}
+              </p>
+              <Link
+                to={ROUTES.LOGIN}
+                style={{
+                  fontFamily: 'var(--font-body)', fontSize: '14px', color: '#007BFF',
+                  textDecoration: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6
+                }}
+              >
+                <ArrowLeft size={16} /> Kembali ke Beranda
+              </Link>
+            </div>
+          )}
+
+          {!resentError && (
+             <Link
+                to={ROUTES.LOGIN}
+                style={{
+                  marginTop: 32,
+                  fontFamily: 'var(--font-body)', fontSize: '14px', color: '#6B7280',
+                  textDecoration: 'none', fontWeight: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6
+                }}
+              >
+                <ArrowLeft size={16} /> Kembali ke Login
+              </Link>
           )}
         </div>
       </motion.div>

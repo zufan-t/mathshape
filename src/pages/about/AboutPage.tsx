@@ -3,14 +3,14 @@ import { motion, useInView } from 'framer-motion'
 import najwa from "../../assets/najwa.jpg"
 import salsa from "../../assets/salsa.jpg"
 import rafi from "../../assets/rafi.jpg"
-import zufan from "../../assets/zufan.jpg"
+import zufan from "../../assets/zufan.jpeg"
 
 // ─── Team data ─────────────────────────────────────────────────────────────────
 const teamMembers = [
   {
     name: 'Zufan Taufiqurrohman',
     prodi: 'Statistika Terapan dan Komputasi',
-    roles: ['UI/UX Designer', 'Front End Developer', 'Back End Developer'],
+    roles: ['UI/UX Designer', 'Fullstack Developer'],
     photo: zufan,
   },
   {

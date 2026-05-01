@@ -40,7 +40,7 @@ export default function ForgotPasswordPage() {
 
     // ── ANTI-ENUMERATION: selalu navigate ke halaman sukses ──────────────
     // Tidak peduli apakah email ada atau tidak, response ke user sama.
-    navigate(ROUTES.EMAIL_SENT)
+    navigate(ROUTES.EMAIL_SENT, { state: { email, type: 'recovery' } })
   }
 
   return (

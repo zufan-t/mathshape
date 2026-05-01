@@ -126,7 +126,9 @@ export default function RegisterPage() {
       }
       setLoading(false)
     } else {
-      navigate(ROUTES.EMAIL_SENT)
+      // Paksa logout agar tidak auto-login sebelum verifikasi email
+      await supabase.auth.signOut()
+      navigate(ROUTES.EMAIL_SENT, { state: { email, type: 'signup' } })
     }
   }
 
