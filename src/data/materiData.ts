@@ -62,14 +62,9 @@ export const MATERI_DATA: MateriPertemuan[] = [
     guidingResources: [
       {
         type: 'youtube',
-        url: 'https://youtu.be/uFChWnX_LUo?si=u39uvUTBTHE-XTUSy',
+        url: 'https://youtu.be/_vmaVr4QKYE?si=3LzcqVlKrZUt3bWX',
         label: 'Video 1',
-      },
-      {
-        type: 'youtube',
-        url: 'https://youtu.be/_vmaVr4QKYE?si=3LzcqVIKrZUt3bWX',
-        label: 'Video 2',
-      },
+      }
     ],
     solutions: [
       '1. Sebagai arsitek, menurutmu apa hubungannya antara sudut yang besarnya sama dengan beban atap yang terbagi rata?',
