@@ -233,7 +233,7 @@ export default function RegisterPage() {
                   autoComplete="new-password"
                   value={password}
                   onChange={handlePasswordChange}
-                  placeholder="Minimal 8 karakter, huruf + angka"
+                  placeholder="Minimal 8 karakter"
                   style={{ ...inputStyle(!!passwordError), paddingRight: '48px' }}
                   onFocus={e => { if (!passwordError) e.target.style.borderColor = '#007BFF' }}
                   onBlur={e => { if (!passwordError) e.target.style.borderColor = '#E5E7EB' }}
