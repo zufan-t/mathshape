@@ -212,4 +212,30 @@ Tuliskan hasil kerja kelompok pada lembar yang telah disediakan, kemudian siapka
 
  
 
- 
+
+
+REVISI 2
+Pertemuan 1
+
+*Esensial question* (isian)
+*The challange* diberi perintah di akhir ( Kerjakan challange berikut dengan kelompok)
+*Guiding Question* 1-3 (isian) no 4 (gambar/pdf)
+*Guiding activity* perintah dijadikan 1 pengumpulan dalam bentuk (Pdf)
+*Solutions* Pengumpulan PDF
+
+Pertemuan 2
+*Esensial Question* isian semua
+*The challange* diberi perintah di akhir ( Kerjakan challange berikut dengan kelompok)
+*Guiding Question* isian semua
+*Guiding activity* pengumpulan dalam bentuk (Pdf)
+*Solutions* Pengumpulan PDF
+
+Pertemuan 3
+*Esensial Question* isian semua
+*The challange* diberi perintah di akhir ( Kerjakan challange berikut dengan kelompok)
+*Guiding Question* isian semua
+*Guiding activity* pengumpulan dalam bentuk (Pdf)
+*Solutions* Pengumpulan PDF
+
+
+

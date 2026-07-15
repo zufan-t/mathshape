@@ -8,6 +8,8 @@ import {
   Student,
   Warning,
   CircleNotch,
+  FilePdf,
+  Image,
 } from '@phosphor-icons/react'
 import { useAuth } from '@/features/auth/AuthContext'
 import { supabase } from '@/lib/supabase'
@@ -365,11 +367,10 @@ export default function TeacherDashboardPage() {
 
                   {/* Grouped sections */}
                   {[
-                    { title: 'Essential Questions', key: 'essentialQuestions', secIdx: 2, items: currentMaterial.essentialQuestions },
-                    { title: 'The Challenge', key: 'theChallenge', secIdx: 3, items: [currentMaterial.theChallenge.deskripsi] },
-                    { title: 'Guiding Activities', key: 'guidingActivities', secIdx: 4, items: currentMaterial.guidingActivities },
-                    { title: 'Guiding Questions', key: 'guidingQuestions', secIdx: 5, items: currentMaterial.guidingQuestions },
-                    { title: 'Solutions', key: 'solutions', secIdx: 7, items: currentMaterial.solutions },
+                    { title: 'Essential Questions', key: 'essentialQuestions', secIdx: 2, type: 'text', items: currentMaterial.essentialQuestions },
+                    { title: 'Guiding Activities', key: 'guidingActivities', secIdx: 5, type: 'file', items: ['Upload Laporan Aktivitas (PDF)'] },
+                    { title: 'Guiding Questions', key: 'guidingQuestions', secIdx: 6, type: 'text', items: currentMaterial.guidingQuestions },
+                    { title: 'Solutions', key: 'solutions', secIdx: 7, type: 'file', items: ['Upload Hasil Challenge (PDF)'] },
                   ].map((sec) => {
                     return (
                       <div
@@ -401,6 +402,24 @@ export default function TeacherDashboardPage() {
                           {sec.items.map((prompt, qIdx) => {
                             const answerKey = `${sec.secIdx}_${qIdx}`
                             const answerText = answers[answerKey]
+
+                            const isFile = sec.type === 'file' || (sec.secIdx === 6 && selectedMaterialId === 1 && qIdx === 3)
+                            let fileObj: { fileName: string; fileSize: number; fileType: string; fileData?: string; fileUrl?: string; filePath?: string } | null = null
+                            if (isFile && answerText) {
+                              try {
+                                fileObj = JSON.parse(answerText)
+                              } catch (e) {
+                                // Treat as raw text
+                              }
+                            }
+
+                            const formatSize = (bytes: number) => {
+                              if (!bytes || bytes === 0) return '0 B'
+                              const k = 1024
+                              const sizes = ['B', 'KB', 'MB']
+                              const i = Math.floor(Math.log(bytes) / Math.log(k))
+                              return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
+                            }
 
                             return (
                               <div key={qIdx} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -443,7 +462,65 @@ export default function TeacherDashboardPage() {
                                   marginTop: 4,
                                   position: 'relative',
                                 }}>
-                                  {answerText ? (
+                                  {isFile ? (
+                                    fileObj ? (
+                                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+                                          {fileObj.fileType.includes('pdf') ? (
+                                            <div style={{ color: '#EF4444', display: 'flex' }}><FilePdf size={28} weight="fill" /></div>
+                                          ) : (
+                                            <div style={{ color: '#10B981', display: 'flex' }}><Image size={28} weight="fill" /></div>
+                                          )}
+                                          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                                            <span style={{
+                                              fontFamily: 'var(--font-body)',
+                                              fontSize: 14,
+                                              fontWeight: 600,
+                                              color: 'var(--color-text)',
+                                              whiteSpace: 'nowrap',
+                                              overflow: 'hidden',
+                                              textOverflow: 'ellipsis'
+                                            }}>
+                                              {fileObj.fileName}
+                                            </span>
+                                            <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--color-text-light)' }}>
+                                              {formatSize(fileObj.fileSize)}
+                                            </span>
+                                          </div>
+                                        </div>
+                                        <a
+                                          href={fileObj.fileUrl || fileObj.fileData}
+                                          download={fileObj.fileName}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          style={{
+                                            fontSize: 13,
+                                            fontWeight: 600,
+                                            color: '#007BFF',
+                                            textDecoration: 'none',
+                                            padding: '6px 12px',
+                                            borderRadius: 8,
+                                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                                            transition: 'background-color 200ms'
+                                          }}
+                                          onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(0, 123, 255, 0.2)'}
+                                          onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(0, 123, 255, 0.1)'}
+                                        >
+                                          Unduh / Buka
+                                        </a>
+                                      </div>
+                                    ) : (
+                                      <p style={{
+                                        fontFamily: 'var(--font-body)',
+                                        fontSize: 14,
+                                        fontStyle: 'italic',
+                                        color: '#9CA3AF',
+                                        margin: 0,
+                                      }}>
+                                        Belum ada file diunggah oleh siswa
+                                      </p>
+                                    )
+                                  ) : answerText ? (
                                     <p style={{
                                       fontFamily: 'var(--font-body)',
                                       fontSize: 15,

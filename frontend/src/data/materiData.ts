@@ -47,7 +47,7 @@ export const MATERI_DATA: MateriPertemuan[] = [
       ],
     },
     guidingActivities: [
-      'Gunakan aplikasi GeoGebra (versi web/aplikasi) untuk melakukan eksplorasi berikut:',
+      'Gunakan aplikasi GeoGebra (versi web/aplikasi) melalui tautan berikut: https://www.geogebra.org/geometry untuk melakukan eksplorasi berikut:',
       'Buat dua garis sejajar menggunakan tool Line dan pastikan sejajar dengan tool Parallel Line.',
       'Buat satu garis transversal yang memotong kedua garis sejajar tersebut.',
       'Tandai titik-titik perpotongan, lalu gunakan tool Angle untuk mengukur seluruh sudut yang terbentuk pada kedua titik perpotongan (akan ada 8 sudut).',
@@ -108,7 +108,7 @@ export const MATERI_DATA: MateriPertemuan[] = [
     guidingResources: [
       {
         type: 'link',
-        url: 'https://www.canva.com/design/DAHOHjLV7CU/a13v0yJoiS6yEVrQfD_h9g/edit',
+        url: 'https://canva.link/ig9jhrz5b8vcvp3',
         label: 'Canva: Hubungan Antar Sudut',
       },
     ],

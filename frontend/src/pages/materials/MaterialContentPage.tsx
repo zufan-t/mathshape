@@ -4,10 +4,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   CaretDoubleLeft, CaretLeft, CaretRight, CheckCircle,
   Flag, Info, Crosshair, GraduationCap, MagnifyingGlass,
-  YoutubeLogo, SealCheck, X, CircleNotch
+  YoutubeLogo, SealCheck, X, CircleNotch,
+  UploadSimple, FilePdf, Image, Trash
 } from '@phosphor-icons/react'
 import { ROUTES } from '@/lib/constants'
 import { getMateriById } from '@/data/materiData'
+import { supabase } from '@/lib/supabase'
 import { useMaterialContent } from '@/features/materials/useMaterialContent'
 import { useAuth } from '@/features/auth/AuthContext'
 import { useProgress } from '@/features/progress/useProgress'
@@ -30,9 +32,9 @@ const SECTION_LABELS = [
   'Big Idea',
   'Essential Question',
   'The Challenge',
+  'Guiding Resources',
   'Guiding Activities',
   'Guiding Questions',
-  'Guiding Resources',
   'Solutions',
 ] as const
 
@@ -126,6 +128,276 @@ function AnswerInput({ id, disabled, value, onChange }: AnswerInputProps) {
         placeholder={disabled ? "Materi sudah selesai, jawaban tidak dapat diubah." : "Tuliskan jawaban Anda di sini..."}
         className="answer-textarea"
       />
+    </div>
+  )
+}
+
+// ─── File Upload Area Component ───────────────────────────────────────────────
+function FileUploadArea({
+  id,
+  disabled,
+  value,
+  onChange,
+  instructionText = "Upload your challenge work here.",
+  userId,
+  materialId,
+  sectionIndex,
+  acceptType = 'all',
+}: {
+  id: string
+  disabled: boolean
+  value: string
+  onChange: (val: string) => void
+  instructionText?: string
+  userId: string
+  materialId: number
+  sectionIndex: number
+  acceptType?: 'pdf' | 'all'
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [dragging, setDragging] = useState(false)
+  const [uploading, setUploading] = useState(false)
+
+  let fileObj: { fileName: string; fileSize: number; fileType: string; fileData?: string; fileUrl?: string; filePath?: string } | null = null
+  try {
+    if (value) {
+      fileObj = JSON.parse(value)
+    }
+  } catch (e) {
+    // Treat as raw string
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    processFile(file)
+  }
+
+  const processFile = async (file: File) => {
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Ukuran file maksimal adalah 5MB.')
+      return
+    }
+
+    if (acceptType === 'pdf' && !file.type.includes('pdf')) {
+      alert('Format file tidak sesuai. Harap unggah file dalam bentuk PDF.')
+      return
+    }
+
+    if (!supabase) {
+      alert('Supabase client tidak terkonfigurasi. Periksa file .env Anda.')
+      return
+    }
+
+    setUploading(true)
+    try {
+      const cleanedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
+      const filePath = `${userId}/${materialId}/${sectionIndex}/${Date.now()}_${cleanedName}`
+
+      const { error } = await supabase.storage
+        .from('materials')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true
+        })
+
+      if (error) throw error
+
+      const { data: urlData } = supabase.storage
+        .from('materials')
+        .getPublicUrl(filePath)
+
+      const fileJSON = JSON.stringify({
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        fileUrl: urlData.publicUrl,
+        filePath: filePath
+      })
+
+      onChange(fileJSON)
+    } catch (err: any) {
+      console.error('[FileUploadArea] Error uploading file:', err)
+      alert('Gagal mengunggah file: ' + (err.message || 'Terjadi kesalahan'))
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const handleFileDelete = async () => {
+    if (!fileObj) {
+      onChange('')
+      return
+    }
+
+    if (fileObj.filePath && supabase) {
+      try {
+        await supabase.storage
+          .from('materials')
+          .remove([fileObj.filePath])
+      } catch (err) {
+        console.warn('[FileUploadArea] Failed to delete file from storage bucket:', err)
+      }
+    }
+    onChange('')
+  }
+
+  const formatSize = (bytes: number) => {
+    if (bytes === 0) return '0 B'
+    const k = 1024
+    const sizes = ['B', 'KB', 'MB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
+  }
+
+  const fileUrl = fileObj ? (fileObj.fileUrl || fileObj.fileData) : ''
+
+  return (
+    <div style={{ marginTop: 16 }}>
+      <label style={{ display: 'block', fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600, color: 'var(--color-text)', marginBottom: 8 }}>
+        {instructionText}
+      </label>
+      
+      {fileObj ? (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '12px 16px',
+          borderRadius: 12,
+          backgroundColor: 'var(--color-input-bg, #F0F2F8)',
+          border: '1.5px solid var(--color-neutral-light)',
+          gap: 12
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+            {fileObj.fileType.includes('pdf') ? (
+              <div style={{ color: '#EF4444', display: 'flex' }}><FilePdf size={28} weight="fill" /></div>
+            ) : (
+              <div style={{ color: '#10B981', display: 'flex' }}><Image size={28} weight="fill" /></div>
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+              <span style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 14,
+                fontWeight: 600,
+                color: 'var(--color-text)',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}>
+                {fileObj.fileName}
+              </span>
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--color-text-light)' }}>
+                {formatSize(fileObj.fileSize)}
+              </span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <a
+              href={fileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              download={fileObj.fileName}
+              style={{
+                fontSize: 13,
+                fontWeight: 600,
+                color: '#007BFF',
+                textDecoration: 'none',
+                padding: '6px 12px',
+                borderRadius: 8,
+                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                transition: 'background-color 200ms'
+              }}
+              onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(0, 123, 255, 0.2)'}
+              onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(0, 123, 255, 0.1)'}
+            >
+              Unduh / Lihat
+            </a>
+            {!disabled && (
+              <button
+                onClick={handleFileDelete}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#EF4444',
+                  padding: 8,
+                  borderRadius: 8,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'background-color 200ms'
+                }}
+                onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)'}
+                onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                title="Hapus file"
+              >
+                <Trash size={18} />
+              </button>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div
+          onDragOver={(e) => { e.preventDefault(); if (!disabled && !uploading) setDragging(true) }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={(e) => {
+            e.preventDefault()
+            setDragging(false)
+            if (disabled || uploading) return
+            const file = e.dataTransfer.files?.[0]
+            if (file) processFile(file)
+          }}
+          onClick={() => { if (!disabled && !uploading) fileInputRef.current?.click() }}
+          style={{
+            border: dragging ? '2px dashed #007BFF' : '2px dashed var(--color-neutral-light)',
+            borderRadius: 16,
+            padding: '24px 16px',
+            textAlign: 'center',
+            cursor: (disabled || uploading) ? 'default' : 'pointer',
+            backgroundColor: dragging ? 'var(--color-primary-light)' : 'transparent',
+            transition: 'all 200ms ease',
+            opacity: (disabled || uploading) ? 0.6 : 1,
+          }}
+          onMouseEnter={e => { if (!disabled && !dragging && !uploading) e.currentTarget.style.borderColor = '#007BFF' }}
+          onMouseLeave={e => { if (!disabled && !dragging && !uploading) e.currentTarget.style.borderColor = 'var(--color-neutral-light)' }}
+        >
+          <input
+            type="file"
+            id={id}
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept={acceptType === 'pdf' ? 'application/pdf' : 'application/pdf, image/*'}
+            style={{ display: 'none' }}
+            disabled={disabled || uploading}
+          />
+          {uploading ? (
+            <>
+              <div style={{ color: '#007BFF', display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
+                <CircleNotch className="animate-spin" size={32} />
+              </div>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600, color: 'var(--color-text)', margin: '0 0 4px' }}>
+                Mengunggah file...
+              </p>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--color-text-light)', margin: 0 }}>
+                Mohon tunggu beberapa saat.
+              </p>
+            </>
+          ) : (
+            <>
+              <div style={{ color: dragging ? '#007BFF' : 'var(--color-text-light)', display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
+                <UploadSimple size={32} />
+              </div>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600, color: 'var(--color-text)', margin: '0 0 4px' }}>
+                Klik atau seret file ke sini untuk mengunggah
+              </p>
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--color-text-light)', margin: 0 }}>
+                {acceptType === 'pdf' ? 'PDF (Maks. 5MB)' : 'PDF atau Foto (Maks. 5MB)'}
+              </p>
+            </>
+          )}
+        </div>
+      )}
     </div>
   )
 }
@@ -875,37 +1147,24 @@ export default function MaterialContentPage() {
       }
     })
 
-    // Section 3: The Challenge
-    const val3 = answers[`3_0`]
-    if (!val3 || !val3.trim()) {
+    // Section 5: Guiding Activities
+    const val5 = answers[`5_0`]
+    if (!val5 || !val5.trim()) {
       unfilled.push({
-        sectionIndex: 3,
-        sectionLabel: SECTION_LABELS[3],
+        sectionIndex: 5,
+        sectionLabel: SECTION_LABELS[5],
         questionIndex: 0,
-        questionText: materi.theChallenge.deskripsi
+        questionText: 'Unggah laporan aktivitas (PDF atau Foto)'
       })
     }
 
-    // Section 4: Guiding Activities
-    materi.guidingActivities.forEach((a, i) => {
-      const val = answers[`4_${i}`]
-      if (!val || !val.trim()) {
-        unfilled.push({
-          sectionIndex: 4,
-          sectionLabel: SECTION_LABELS[4],
-          questionIndex: i,
-          questionText: a
-        })
-      }
-    })
-
-    // Section 5: Guiding Questions
+    // Section 6: Guiding Questions
     materi.guidingQuestions.forEach((q, i) => {
-      const val = answers[`5_${i}`]
+      const val = answers[`6_${i}`]
       if (!val || !val.trim()) {
         unfilled.push({
-          sectionIndex: 5,
-          sectionLabel: SECTION_LABELS[5],
+          sectionIndex: 6,
+          sectionLabel: SECTION_LABELS[6],
           questionIndex: i,
           questionText: q
         })
@@ -913,17 +1172,15 @@ export default function MaterialContentPage() {
     })
 
     // Section 7: Solutions
-    materi.solutions.forEach((s, i) => {
-      const val = answers[`7_${i}`]
-      if (!val || !val.trim()) {
-        unfilled.push({
-          sectionIndex: 7,
-          sectionLabel: SECTION_LABELS[7],
-          questionIndex: i,
-          questionText: s
-        })
-      }
-    })
+    const val7 = answers[`7_0`]
+    if (!val7 || !val7.trim()) {
+      unfilled.push({
+        sectionIndex: 7,
+        sectionLabel: SECTION_LABELS[7],
+        questionIndex: 0,
+        questionText: 'Upload your challenge work here'
+      })
+    }
 
     return unfilled
   }
@@ -1059,54 +1316,23 @@ export default function MaterialContentPage() {
         return (
           <SectionCard key="challenge" sectionRef={ref} icon={<IconBadge bg="#E49FFF" color="#7C299D"><Crosshair size={22} /></IconBadge>} title="The Challenge">
             <p style={{ margin: '0 0 12px' }}>{renderTextWithLinks(m.theChallenge.deskripsi)}</p>
-            <ul style={{ margin: '0 0 20px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <ul style={{ margin: '0 0 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
               {m.theChallenge.poin.map((p, i) => <li key={i}>{renderTextWithLinks(p)}</li>)}
             </ul>
-            <AnswerInput
-              id="answer-3-0"
-              disabled={isMaterialCompleted}
-              value={answers[`3_0`] || ''}
-              onChange={(val) => setAnswers(prev => ({ ...prev, '3_0': val }))}
-            />
+            <div style={{
+              marginTop: 16,
+              padding: '12px 16px',
+              backgroundColor: 'var(--color-primary-light)',
+              borderRadius: 12,
+              color: '#007BFF',
+              fontWeight: 600,
+              fontSize: 14
+            }}>
+              * Kerjakan challenge berikut dengan kelompok
+            </div>
           </SectionCard>
         )
       case 4:
-        return (
-          <SectionCard key="activities" sectionRef={ref} icon={<IconBadge bg="#F7FFA1" color="#DEA30D"><GraduationCap size={22} /></IconBadge>} title="Guiding Activities">
-            <ol style={{ margin: 0, paddingLeft: 0, display: 'flex', flexDirection: 'column', gap: 24 }}>
-              {m.guidingActivities.map((a, i) => (
-                <div key={i}>
-                  <li style={{ listStyleType: 'decimal', marginLeft: 20 }}>{renderTextWithLinks(a)}</li>
-                  <AnswerInput
-                    id={`answer-4-${i}`}
-                    disabled={isMaterialCompleted}
-                    value={answers[`4_${i}`] || ''}
-                    onChange={(val) => setAnswers(prev => ({ ...prev, [`4_${i}`]: val }))}
-                  />
-                </div>
-              ))}
-            </ol>
-          </SectionCard>
-        )
-      case 5:
-        return (
-          <SectionCard key="questions" sectionRef={ref} icon={<IconBadge bg="#F7FFA1" color="#DEA30D"><MagnifyingGlass size={22} /></IconBadge>} title="Guiding Questions">
-            <ol style={{ margin: 0, paddingLeft: 0, display: 'flex', flexDirection: 'column', gap: 24 }}>
-              {m.guidingQuestions.map((q, i) => (
-                <div key={i}>
-                  <li style={{ listStyleType: 'decimal', marginLeft: 20 }}>{renderTextWithLinks(q)}</li>
-                  <AnswerInput
-                    id={`answer-5-${i}`}
-                    disabled={isMaterialCompleted}
-                    value={answers[`5_${i}`] || ''}
-                    onChange={(val) => setAnswers(prev => ({ ...prev, [`5_${i}`]: val }))}
-                  />
-                </div>
-              ))}
-            </ol>
-          </SectionCard>
-        )
-      case 6:
         return (
           <SectionCard key="resources" sectionRef={ref} icon={<IconBadge bg="#FEDCDC" color="#B51F29"><YoutubeLogo size={22} /></IconBadge>} title="Guiding Resources">
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -1156,22 +1382,82 @@ export default function MaterialContentPage() {
             </div>
           </SectionCard>
         )
+      case 5:
+        return (
+          <SectionCard key="activities" sectionRef={ref} icon={<IconBadge bg="#F7FFA1" color="#DEA30D"><GraduationCap size={22} /></IconBadge>} title="Guiding Activities">
+            <ol style={{ margin: '0 0 24px', paddingLeft: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {m.guidingActivities.map((a, i) => (
+                <li key={i} style={{ listStyleType: 'decimal', marginLeft: 20 }}>{renderTextWithLinks(a)}</li>
+              ))}
+            </ol>
+            <FileUploadArea
+              id="answer-5-0"
+              disabled={isMaterialCompleted}
+              value={answers['5_0'] || ''}
+              onChange={(val) => setAnswers(prev => ({ ...prev, '5_0': val }))}
+              userId={user?.id || ''}
+              materialId={materialId}
+              sectionIndex={5}
+              acceptType="pdf"
+              instructionText={
+                materialId === 1
+                  ? "Selesaikan langkah 1–7 di atas, lalu unggah laporan/bukti pengerjaan Anda di sini dalam bentuk PDF:"
+                  : "Unggah hasil pengerjaan aktivitas Anda di sini dalam bentuk PDF:"
+              }
+            />
+          </SectionCard>
+        )
+      case 6:
+        return (
+          <SectionCard key="questions" sectionRef={ref} icon={<IconBadge bg="#F7FFA1" color="#DEA30D"><MagnifyingGlass size={22} /></IconBadge>} title="Guiding Questions">
+            <ol style={{ margin: 0, paddingLeft: 0, display: 'flex', flexDirection: 'column', gap: 24 }}>
+              {m.guidingQuestions.map((q, i) => (
+                <div key={i}>
+                  <li style={{ listStyleType: 'decimal', marginLeft: 20 }}>{renderTextWithLinks(q)}</li>
+                  {materialId === 1 && i === 3 ? (
+                    <FileUploadArea
+                      id={`answer-6-${i}`}
+                      disabled={isMaterialCompleted}
+                      value={answers[`6_${i}`] || ''}
+                      onChange={(val) => setAnswers(prev => ({ ...prev, [`6_${i}`]: val }))}
+                      userId={user?.id || ''}
+                      materialId={materialId}
+                      sectionIndex={6}
+                      acceptType="all"
+                      instructionText="Unggah gambar atau PDF rancangan atap Anda di sini:"
+                    />
+                  ) : (
+                    <AnswerInput
+                      id={`answer-6-${i}`}
+                      disabled={isMaterialCompleted}
+                      value={answers[`6_${i}`] || ''}
+                      onChange={(val) => setAnswers(prev => ({ ...prev, [`6_${i}`]: val }))}
+                    />
+                  )}
+                </div>
+              ))}
+            </ol>
+          </SectionCard>
+        )
       case 7:
         return (
           <SectionCard key="solutions" sectionRef={ref} icon={<IconBadge bg="#EBF7ED" color="#279827"><SealCheck size={22} /></IconBadge>} title="Solutions">
-            <ul style={{ margin: 0, paddingLeft: 0, display: 'flex', flexDirection: 'column', gap: 24 }}>
+            <ul style={{ margin: '0 0 24px', paddingLeft: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
               {m.solutions.map((s, i) => (
-                <div key={i}>
-                  <li style={{ listStyleType: 'disc', marginLeft: 20 }}>{renderTextWithLinks(s)}</li>
-                  <AnswerInput
-                    id={`answer-7-${i}`}
-                    disabled={isMaterialCompleted}
-                    value={answers[`7_${i}`] || ''}
-                    onChange={(val) => setAnswers(prev => ({ ...prev, [`7_${i}`]: val }))}
-                  />
-                </div>
+                <li key={i} style={{ listStyleType: 'disc', marginLeft: 20 }}>{renderTextWithLinks(s)}</li>
               ))}
             </ul>
+            <FileUploadArea
+              id="answer-7-0"
+              disabled={isMaterialCompleted}
+              value={answers['7_0'] || ''}
+              onChange={(val) => setAnswers(prev => ({ ...prev, '7_0': val }))}
+              userId={user?.id || ''}
+              materialId={materialId}
+              sectionIndex={7}
+              acceptType="pdf"
+              instructionText="Unggah hasil pengerjaan challenge Anda di sini dalam bentuk PDF:"
+            />
           </SectionCard>
         )
       default:
