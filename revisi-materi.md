@@ -238,4 +238,13 @@ Pertemuan 3
 *Solutions* Pengumpulan PDF
 
 
-
+------------------------------------
+Revisi media
+Kegiatan Belajar 1
+1. Guiding question (Perubahan soal)
+2. Tambahan di akhir diberi reflection
+Kegiatan Belajar 2
+1. Esensial Question (perubahan soal pada pertanyaan 1 dibuat agar bisa upload gambar maupun pdf)
+2. Guiding Question ( Perubahan soal)
+3. Guiding Activity ( perubahan perintah dan link)
+4. Tambahan di akhir diberi reflection

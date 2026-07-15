@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import Layout from '@/components/layout/Layout'
 import MaterialLayout from '@/components/layout/MaterialLayout'
 import TeacherLayout from '@/components/layout/TeacherLayout'
+import TeacherAuthLayout from '@/components/layout/TeacherAuthLayout'
 import AuthLayout from '@/components/layout/AuthLayout'
 import HomePage from '@/pages/home/HomePage'
 import AboutPage from '@/pages/about/AboutPage'
@@ -43,6 +44,12 @@ function App() {
             <Route path={ROUTES.TEACHER_DASHBOARD} element={<TeacherDashboardPage />} />
           </Route>
 
+          {/* Teacher auth — uses TeacherAuthLayout */}
+          <Route element={<TeacherAuthLayout />}>
+            <Route path={ROUTES.TEACHER_LOGIN} element={<LoginPage />} />
+            <Route path={ROUTES.TEACHER_REGISTER} element={<RegisterPage />} />
+          </Route>
+
           {/* Material content — pakai MaterialLayout agar navbar tampilkan judul */}
           <Route element={<MaterialLayout />}>
             <Route path={ROUTES.MATERIAL_CONTENT} element={<MaterialContentPage />} />
@@ -53,8 +60,6 @@ function App() {
           <Route element={<AuthLayout />}>
             <Route path={ROUTES.LOGIN} element={<LoginPage />} />
             <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
-            <Route path={ROUTES.TEACHER_LOGIN} element={<LoginPage />} />
-            <Route path={ROUTES.TEACHER_REGISTER} element={<RegisterPage />} />
             <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
             <Route path={ROUTES.EMAIL_SENT} element={<EmailSentPage />} />
             <Route path={ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
