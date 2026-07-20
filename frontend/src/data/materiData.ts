@@ -21,6 +21,11 @@ export interface MateriPertemuan {
     label?: string
   }[]
   solutions: string[]
+  kuis: {
+    deskripsi: string
+    pertanyaan: string[]
+  }
+  refleksi: string
 }
 
 // ─── Data Statis 3 Pertemuan (Sesuai revisi-materi.md) ─────────────────────────
@@ -33,7 +38,7 @@ export const MATERI_DATA: MateriPertemuan[] = [
     pertemuanLabel: 'Pertemuan 1',
     judul: 'Kedudukan Garis',
     cp: COMMON_CP,
-    tp: 'Melalui model challenge-based deep learning, murid dapat menentukan hubungan antarsudut pada garis berpotongan.',
+    tp: 'Melalui model challange based deep learning, murid dapat menentukan hubungan antarsudut pada garis berpotongan.',
     bigIdea: 'Perhatikan gambar di bawah ini! Gambar ini menunjukkan bagaimana konsep garis sejajar dan transversal diterapkan secara nyata dalam konstruksi bangunan. Big Idea kita kali ini adalah memahami bahwa presisi sudut bukan hanya soal angka di atas kertas, melainkan dasar utama dari keamanan dan kekuatan sebuah struktur bangunan.',
     essentialQuestions: [
       'Bagaimana para tukang bangunan memastikan setiap sudut pada rangka atap presisi agar mampu menahan beban ribuan genteng yang berat?',
@@ -47,7 +52,7 @@ export const MATERI_DATA: MateriPertemuan[] = [
       ],
     },
     guidingActivities: [
-      'Gunakan aplikasi GeoGebra (versi web/aplikasi) melalui tautan berikut: https://www.geogebra.org/geometry untuk melakukan eksplorasi berikut:',
+      'Gunakan aplikasi GeoGebra (versi web/aplikasi) untuk melakukan eksplorasi berikut: https://www.geogebra.org/m/uHuMhQUH',
       'Buat dua garis sejajar menggunakan tool Line dan pastikan sejajar dengan tool Parallel Line.',
       'Buat satu garis transversal yang memotong kedua garis sejajar tersebut.',
       'Tandai titik-titik perpotongan, lalu gunakan tool Angle untuk mengukur seluruh sudut yang terbentuk pada kedua titik perpotongan (akan ada 8 sudut).',
@@ -58,7 +63,7 @@ export const MATERI_DATA: MateriPertemuan[] = [
     guidingQuestions: [
       'Jika dua batang kayu sejajar dipotong oleh satu batang diagonal, hubungan apa yang terbentuk di antara sudut-sudut pada titik persambungannya?',
       'Apa yang terjadi pada besar sudut-sudut tersebut jika kemiringan (gradien) batang transversal diubah?',
-      'Bagaimana cara membuktikan bahwa sudut di sambungan bawah dan atas benar-benar sama besar?',
+      'Bagaimana cara membuktikan bahwa sudut di sambungan bawah dan atas benar benar sama besar?',
       'Gambarkan rancangan atapmu secara rapi! Berikan label nama sudut agar para tukang bangunan tidak bingung ketika ingin memasang atap!',
     ],
     guidingResources: [
@@ -69,20 +74,29 @@ export const MATERI_DATA: MateriPertemuan[] = [
       },
     ],
     solutions: [
-      'Diskusikanlah dengan anggota kelompok kalian untuk menyelesaikan tantangan yang telah dirumuskan pada bagian Challenge.',
+      'Diskusikanlah denggan anggota kelompok kalian untuk menyelesaikan tantangan yang telah dirumuskan pada bagian Challenge.',
       'Gunakan Guiding Resources, Guiding Questions, dan Guiding Activities sebagai panduan dalam proses diskusi dan pemecahan masalah.',
       'Tuliskan hasil kerja kelompok pada lembar yang telah disediakan, kemudian siapkan hasil tersebut untuk dipresentasikan dan didiskusikan bersama di kelas.',
     ],
+    kuis: {
+      deskripsi: 'Dua batang penyangga panel surya dipasang sehingga saling berpotongan membentuk empat sudut yang diberi nama ∠A, ∠B, ∠C, dan ∠D. seperti pada gambar berikut.',
+      pertanyaan: [
+        'Tentukan pasangan sudut yang saling bertolak belakang.',
+        'Tentukan pasangan sudut yang saling berpelurus.',
+        'Jelaskan alasanmu.',
+      ],
+    },
+    refleksi: 'Ayo simpulkan pembelajaran hari ini dan diskusikan di dalam kelas!',
   },
   {
     id: 2,
     pertemuanLabel: 'Pertemuan 2',
     judul: 'Hubungan Antar Sudut',
     cp: COMMON_CP,
-    tp: 'Melalui model challenge-based deep learning, murid dapat menggunakan hubungan sudut pada dua garis sejajar yang dipotong oleh garis transversal untuk menentukan besar sudut yang belum diketahui dengan tepat.',
+    tp: 'Melalui model challange based deep learning, murid dapat menggunakan hubungan sudut pada dua garis sejajar yang dipotong oleh garis transversal untuk menentukan besar sudut yang belum diketahui dengan tepat.',
     bigIdea: 'Perhatikan gambar diatas, tahukah kamu saat kita melihat rangka atap rumah, sebenarnya ada dua balok yang sejajar (berwarna merah) dan satu balok miring yang memotongnya (berwarna kuning). Dalam matematika balok yang ditandai warna merah dapat disebut garis sejajar dan balok yang ditandai warna kuning dapat disebut garis transversal. Dari situ terbentuk beberapa sudut yang saling berhubungan. Dengan memahami hubungan antar sudut tersebut, kita bisa mengetahui besar sudut yang belum diketahui tanpa harus mengukurnya langsung. Pengetahuan ini membantu kita memahami bagaimana bangunan bisa dibuat dengan tepat dan kuat.',
     essentialQuestions: [
-      'Coba perhatikan gambar kerangka atap rumah yang kalian buat. Menurut kalian, garis mana yang sejajar? Garis mana yang miring dan memotong keduanya (garis transversal)?',
+      'Coba perhatikan gambar kerangka atap rumah yang kalian buat pada pertemuan sebelumnya. Menurut kalian, garis mana yang sejajar? Garis mana yang miring dan memotong keduanya (garis transversal). Buatkan ilustrasinya dengan jelas (dapat diberi dengan warna yang berbeda)!',
       'Bagaimana cara kalian menentukan besar sudut-sudut lainnya tanpa mengukur langsung?',
       'Hubungan sudut apa yang bisa kalian gunakan?',
       'Dari semua hubungan itu, bisakah kalian mulai menentukan satu per satu sudut yang belum diketahui?',
@@ -95,11 +109,10 @@ export const MATERI_DATA: MateriPertemuan[] = [
       ],
     },
     guidingActivities: [
-      'Akses lembar aktivitas digital melalui tautan Canva berikut: https://canva.link/qkfj9h32u2vyjt7',
+      'Silahkan kerjakan LKPD berikut yang diberikan oleh guru! https://canva.link/qkfj9h32u2vyjt7',
     ],
     guidingQuestions: [
-      'Coba perhatikan gambar rangka atapnya. Menurut kalian, garis mana yang sejajar? Garis mana yang miring dan memotong keduanya?',
-      'Dari sudut yang diketahui itu, apakah ada sudut lain yang posisinya “mirip” atau sehadap? Kalau ada, menurut kalian apakah besarnya sama atau berbeda?',
+      'Buatlah nama sudut dan besar salah satu sudut dari gambar rangka atap yang telah kalian buat sebelumnya, apakah ada sudut lain yang posisinya “mirip” atau sehadap? Kalau ada, menurut kalian apakah besarnya sama atau berbeda?',
       'Adakah sudut yang saling berhadapan (bertolak belakang)? Menurut kalian, bagaimana hubungan nilainya?',
       'Coba cari sudut yang berada pada satu garis lurus. Jika dijumlahkan, harus berapa derajat?',
       'Dari semua hubungan itu, bisakah kalian mulai menentukan satu per satu sudut yang belum diketahui?',
@@ -113,24 +126,34 @@ export const MATERI_DATA: MateriPertemuan[] = [
       },
     ],
     solutions: [
-      'Diskusikanlah dengan anggota kelompok kalian untuk menyelesaikan tantangan yang telah dirumuskan pada bagian Challenge.',
+      'Diskusikanlah denggan anggota kelompok kalian untuk menyelesaikan tantangan yang telah dirumuskan pada bagian Challenge.',
       'Gunakan Guiding Resources, Guiding Questions, dan Guiding Activities sebagai panduan dalam proses diskusi dan pemecahan masalah.',
       'Tuliskan hasil kerja kelompok pada lembar yang telah disediakan, kemudian siapkan hasil tersebut untuk dipresentasikan dan didiskusikan bersama di kelas.',
     ],
+    kuis: {
+      deskripsi: 'Seorang teknisi sedang memasang dua rel konveyor otomatis pada sebuah pabrik. Agar konveyor bekerja dengan baik, kedua rel harus dipasang sejajar. Sebuah batang penyangga dipasang melintang sehingga membentuk sudut-sudut seperti pada gambar berikut. Diketahui besar ∠a = 65°.',
+      pertanyaan: [
+        'Tentukan besar sudut b, c, d, e, f, g, dan h.',
+        'Tuliskan hubungan sudut yang kamu gunakan untuk menentukan masing-masing sudut tersebut (misalnya: bertolak belakang, sehadap, dalam berseberangan, luar berseberangan, berpelurus, atau dalam sepihak).',
+        'Jelaskan langkah-langkah penyelesaianmu.',
+        'Mengapa dua rel konveyor harus dipasang sejajar agar sistem dapat bekerja dengan baik? Kaitkan jawabanmu dengan konsep hubungan sudut.',
+      ],
+    },
+    refleksi: 'Ayo simpulkan pembelajaran hari ini dan diskusikan di dalam kelas!',
   },
   {
     id: 3,
     pertemuanLabel: 'Pertemuan 3',
     judul: 'Kesebangunan Segitiga',
     cp: COMMON_CP,
-    tp: 'Melalui model challenge-based deep learning, murid dapat menentukan kesebangunan segitiga dan menyelesaikan masalah sehari-hari yang berkaitan dengan kesebangunan dengan tepat.',
+    tp: 'Melalui model challange based deep learning, murid dapat menentukan menentukan kesebangunan segitiga dan menyelesaikan masalah sehari-hari yang berkaitan dengan kesebangunan dengan tepat.',
     bigIdea: 'Perhatikan gambar di atas! Tahukah kamu bahwa tinggi suatu benda tidak selalu dapat ditentukan dengan cara mengukurnya secara langsung? Dalam kehidupan sehari-hari, terdapat berbagai objek yang sulit dijangkau, seperti pohon, tiang bendera, atau gedung yang tinggi. Meskipun demikian, tinggi objek tersebut tetap dapat ditentukan melalui cara yang lebih sederhana dengan memanfaatkan bayangan yang terbentuk akibat sinar matahari. Dalam matematika, hubungan antara tinggi suatu benda dan panjang bayangannya dapat dijelaskan melalui konsep kesebangunan segitiga. Dengan memahami konsep tersebut, kita dapat menentukan tinggi suatu objek tanpa harus mengukurnya secara langsung. Big Idea kita kali ini adalah memahami bahwa kesebangunan segitiga dapat digunakan sebagai strategi untuk menyelesaikan permasalahan nyata yang berkaitan dengan pengukuran tinggi suatu benda secara tidak langsung.',
     essentialQuestions: [
       'Mengapa tinggi suatu benda tidak selalu dapat diukur secara langsung?',
       'Bagaimana bayangan yang terbentuk akibat sinar matahari dapat dimanfaatkan untuk membantu menentukan tinggi suatu benda?',
       'Mengapa dua segitiga yang terbentuk dari benda dan bayangannya dapat dikatakan sebangun?',
       'Bagaimana konsep kesebangunan segitiga dapat digunakan untuk menentukan tinggi pohon tanpa harus mengukurnya secara langsung?',
-      'Mengapa hasil pengukuran akan lebih akurat jika pengukuran tinggi benda dan panjang bayangan dilakukan pada waktu yang sama?',
+      'Mengapa hasil pengukuran akan lebih akurat jika pengukuran tinggi benda and panjang bayangan dilakukan pada waktu yang sama?',
     ],
     theChallenge: {
       deskripsi: 'Di lingkungan sekolah terdapat sebuah pohon besar yang tingginya belum diketahui. Pihak sekolah memerlukan informasi mengenai tinggi pohon tersebut untuk mendukung perawatan dan menjaga keamanan lingkungan sekolah. Namun, tinggi pohon tidak dapat diukur secara langsung karena keterbatasan alat ukur. Guru memberikan ilustrasi mengenai tinggi benda pembanding dan panjang bayangan yang terbentuk akibat sinar matahari. Berdasarkan informasi tersebut, tentukan tinggi pohon dengan memanfaatkan konsep kesebangunan segitiga. Sajikan proses penyelesaian, perhitungan, serta kesimpulan yang diperoleh secara sistematis.',
@@ -144,12 +167,12 @@ export const MATERI_DATA: MateriPertemuan[] = [
       ],
     },
     guidingActivities: [
-      'Akses lembar aktivitas digital melalui tautan Canva berikut: https://canva.link/xvd9c93x1nr2kww',
+      'Silahkan kerjakan LKPD berikut yang diberikan oleh guru! https://canva.link/xvd9c93x1nr2kww',
     ],
     guidingQuestions: [
-      'Perhatikan ilustrasi yang diberikan. Bangun datar apa yang terbentuk oleh pohon, benda pembanding, dan bayangannya?',
+      'Bangun datar apa yang terbentuk oleh pohon, benda pembanding, dan bayangannya?',
       'Mengapa segitiga yang terbentuk dari pohon dan benda pembanding dapat dikatakan sebangun?',
-      'Sisi-sisi mana yang saling bersesuaian pada kedua segitiga tersebut?',
+      'Sisi-sisi mana yang saling bersesuaian pada kedua segitiga tersebut? (Catatan: Penamaan titik pada kedua segitiga tidak harus sama dengan contoh. Murid dapat memberi nama titik sesuai keinginan, dengan syarat penamaannya konsisten dan pasangan sisi yang ditentukan benar.)',
       'Bagaimana menentukan perbandingan sisi-sisi yang bersesuaian pada kedua segitiga?',
       'Bagaimana menggunakan perbandingan tersebut untuk menentukan tinggi pohon?',
       'Menurut kalian, mengapa pengukuran bayangan harus dilakukan pada waktu yang sama agar hasil perhitungan tetap akurat?',
@@ -162,10 +185,19 @@ export const MATERI_DATA: MateriPertemuan[] = [
       },
     ],
     solutions: [
-      'Diskusikanlah dengan anggota kelompok kalian untuk menyelesaikan tantangan yang telah dirumuskan pada bagian Challenge.',
+      'Diskusikanlah denggan anggota kelompok kalian untuk menyelesaikan tantangan yang telah dirumuskan pada bagian Challenge.',
       'Gunakan Guiding Resources, Guiding Questions, dan Guiding Activities sebagai panduan dalam proses diskusi dan pemecahan masalah.',
       'Tuliskan hasil kerja kelompok pada lembar yang telah disediakan, kemudian siapkan hasil tersebut untuk dipresentasikan dan didiskusikan bersama di kelas.',
     ],
+    kuis: {
+      deskripsi: 'Seorang teknisi ingin memperkirakan tinggi tiang lampu jalan tanpa harus memanjatnya. Ia berbaring di tanah dan mengamati puncak tiang lampu melalui ujung sebuah tongkat seperti pada gambar.\n\nDiketahui:\n• Tinggi tongkat = 4 m\n• Jarak pengamat ke tongkat = 3 m\n• Jarak tongkat ke tiang lampu = 12 m\n• Jarak pandangan ke ujung tongkat = 5m\n• Jarak pandangan ke ujung tiang lampu = 25 m',
+      pertanyaan: [
+        'Tentukan tinggi tiang lampu dengan menggunakan 2 (dua) cara penyelesaian yang berbeda.',
+        'Dengan menggunakan informasi yang tersedia dalam soal tersebut, rancanglah 2 (dua) posisi atau objek lain untuk menghitung perkiraan tinggi tiang lampu.',
+        'Rancanglah posisi atau objek baru yang berbeda dan unik untuk menghitung perkiraan tinggi tiang lampu.',
+      ],
+    },
+    refleksi: 'Ayo simpulkan pembelajaran hari ini dan diskusikan di dalam kelas!',
   },
 ]
 

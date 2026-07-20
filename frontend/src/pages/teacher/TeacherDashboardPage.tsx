@@ -370,7 +370,9 @@ export default function TeacherDashboardPage() {
                     { title: 'Essential Questions', key: 'essentialQuestions', secIdx: 2, type: 'text', items: currentMaterial.essentialQuestions },
                     { title: 'Guiding Activities', key: 'guidingActivities', secIdx: 5, type: 'file', items: ['Upload Laporan Aktivitas (PDF)'] },
                     { title: 'Guiding Questions', key: 'guidingQuestions', secIdx: 6, type: 'text', items: currentMaterial.guidingQuestions },
-                    { title: 'Solutions', key: 'solutions', secIdx: 7, type: 'file', items: ['Upload Hasil Challenge (PDF)'] },
+                    { title: 'Solutions & Publishing', key: 'solutions', secIdx: 7, type: 'file', items: ['Upload Hasil Challenge (PDF)'] },
+                    { title: 'Kuis', key: 'kuis', secIdx: 8, type: 'text', items: [...currentMaterial.kuis.pertanyaan, 'Upload Kuis (PDF/Foto)'] },
+                    { title: 'Refleksi', key: 'refleksi', secIdx: 9, type: 'text', items: [currentMaterial.refleksi] },
                   ].map((sec) => {
                     return (
                       <div
@@ -403,7 +405,10 @@ export default function TeacherDashboardPage() {
                             const answerKey = `${sec.secIdx}_${qIdx}`
                             const answerText = answers[answerKey]
 
-                            const isFile = sec.type === 'file' || (sec.secIdx === 6 && selectedMaterialId === 1 && qIdx === 3)
+                            const isFile = sec.type === 'file' || 
+                              (sec.secIdx === 6 && selectedMaterialId === 1 && qIdx === 3) ||
+                              (sec.secIdx === 2 && selectedMaterialId === 2 && qIdx === 0) ||
+                              (sec.secIdx === 8 && qIdx === currentMaterial.kuis.pertanyaan.length)
                             let fileObj: { fileName: string; fileSize: number; fileType: string; fileData?: string; fileUrl?: string; filePath?: string } | null = null
                             if (isFile && answerText) {
                               try {

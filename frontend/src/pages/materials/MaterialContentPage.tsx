@@ -25,7 +25,7 @@ const BIG_IDEA_IMAGES: Record<number, string> = {
   3: materiTiga,
 }
 
-const TOTAL_SECTIONS = 8
+const TOTAL_SECTIONS = 10
 
 const SECTION_LABELS = [
   'Capaian & Tujuan Pembelajaran',
@@ -35,8 +35,86 @@ const SECTION_LABELS = [
   'Guiding Resources',
   'Guiding Activities',
   'Guiding Questions',
-  'Solutions',
+  'Solutions & Publishing',
+  'Kuis',
+  'Refleksi',
 ] as const
+
+// ─── Kuis SVG Diagrams ────────────────────────────────────────────────────────
+function KuisDiagram({ materialId }: { materialId: number }) {
+  if (materialId === 1) {
+    return (
+      <div style={{ margin: '16px 0', display: 'flex', justifyContent: 'center' }}>
+        <svg width="100%" height="200" viewBox="0 0 400 200" style={{ maxWidth: 450, backgroundColor: 'var(--color-input-bg, #F8FAFC)', borderRadius: 12, border: '1.5px solid var(--color-neutral-light)' }}>
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--color-text)" />
+            </marker>
+          </defs>
+          <line x1="50" y1="100" x2="350" y2="100" stroke="var(--color-text)" strokeWidth="3" markerStart="url(#arrow)" markerEnd="url(#arrow)" />
+          <line x1="120" y1="30" x2="280" y2="170" stroke="var(--color-text)" strokeWidth="3" markerStart="url(#arrow)" markerEnd="url(#arrow)" />
+          <circle cx="200" cy="100" r="4" fill="#007BFF" />
+          <text x="170" y="80" fontFamily="var(--font-heading)" fontSize="16" fontWeight="bold" fill="#EF4444" textAnchor="middle">a</text>
+          <text x="230" y="80" fontFamily="var(--font-heading)" fontSize="16" fontWeight="bold" fill="#10B981" textAnchor="middle">b</text>
+          <text x="170" y="130" fontFamily="var(--font-heading)" fontSize="16" fontWeight="bold" fill="#F59E0B" textAnchor="middle">d</text>
+          <text x="230" y="130" fontFamily="var(--font-heading)" fontSize="16" fontWeight="bold" fill="#3B82F6" textAnchor="middle">c</text>
+        </svg>
+      </div>
+    )
+  }
+  if (materialId === 2) {
+    return (
+      <div style={{ margin: '16px 0', display: 'flex', justifyContent: 'center' }}>
+        <svg width="100%" height="220" viewBox="0 0 400 220" style={{ maxWidth: 450, backgroundColor: 'var(--color-input-bg, #F8FAFC)', borderRadius: 12, border: '1.5px solid var(--color-neutral-light)' }}>
+          <defs>
+            <marker id="arrow2" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--color-text)" />
+            </marker>
+          </defs>
+          <line x1="50" y1="65" x2="350" y2="65" stroke="var(--color-text)" strokeWidth="3" markerStart="url(#arrow2)" markerEnd="url(#arrow2)" />
+          <line x1="50" y1="145" x2="350" y2="145" stroke="var(--color-text)" strokeWidth="3" markerStart="url(#arrow2)" markerEnd="url(#arrow2)" />
+          <line x1="120" y1="20" x2="280" y2="190" stroke="var(--color-text)" strokeWidth="3" markerStart="url(#arrow2)" markerEnd="url(#arrow2)" />
+          <circle cx="168.5" cy="65" r="4" fill="#007BFF" />
+          <circle cx="231.5" cy="145" r="4" fill="#007BFF" />
+          <text x="140" y="50" fontFamily="var(--font-heading)" fontSize="14" fontWeight="bold" fill="#EF4444" textAnchor="middle">a</text>
+          <text x="195" y="50" fontFamily="var(--font-heading)" fontSize="14" fontWeight="bold" fill="#10B981" textAnchor="middle">b</text>
+          <text x="140" y="90" fontFamily="var(--font-heading)" fontSize="14" fontWeight="bold" fill="#F59E0B" textAnchor="middle">d</text>
+          <text x="195" y="90" fontFamily="var(--font-heading)" fontSize="14" fontWeight="bold" fill="#3B82F6" textAnchor="middle">c</text>
+          <text x="205" y="130" fontFamily="var(--font-heading)" fontSize="14" fontWeight="bold" fill="#7C299D" textAnchor="middle">e</text>
+          <text x="260" y="130" fontFamily="var(--font-heading)" fontSize="14" fontWeight="bold" fill="#EC4899" textAnchor="middle">f</text>
+          <text x="205" y="170" fontFamily="var(--font-heading)" fontSize="14" fontWeight="bold" fill="#14B8A6" textAnchor="middle">h</text>
+          <text x="260" y="170" fontFamily="var(--font-heading)" fontSize="14" fontWeight="bold" fill="#6366F1" textAnchor="middle">g</text>
+        </svg>
+      </div>
+    )
+  }
+  if (materialId === 3) {
+    return (
+      <div style={{ margin: '16px 0', display: 'flex', justifyContent: 'center' }}>
+        <svg width="100%" height="240" viewBox="0 0 420 240" style={{ maxWidth: 450, backgroundColor: 'var(--color-input-bg, #F8FAFC)', borderRadius: 12, border: '1.5px solid var(--color-neutral-light)' }}>
+          <line x1="30" y1="180" x2="390" y2="180" stroke="var(--color-text)" strokeWidth="2" />
+          <circle cx="50" cy="180" r="4" fill="var(--color-text)" />
+          <line x1="50" y1="180" x2="40" y2="180" stroke="var(--color-text)" strokeWidth="2" />
+          <line x1="110" y1="180" x2="110" y2="100" stroke="#F59E0B" strokeWidth="3" />
+          <rect x="108" y="100" width="4" height="80" fill="#F59E0B" opacity={0.3} />
+          <line x1="350" y1="180" x2="350" y2="20" stroke="var(--color-text)" strokeWidth="4" />
+          <circle cx="350" cy="20" r="6" fill="#EAB308" />
+          <path d="M340,20 Q350,10 360,20" fill="none" stroke="var(--color-text)" strokeWidth="2" />
+          <line x1="50" y1="180" x2="350" y2="20" stroke="#EF4444" strokeWidth="2" strokeDasharray="4,4" />
+          <path d="M110,170 L120,170 L120,180" fill="none" stroke="var(--color-text)" strokeWidth="1" />
+          <path d="M350,170 L340,170 L340,180" fill="none" stroke="var(--color-text)" strokeWidth="1" />
+          <text x="125" y="145" fontFamily="var(--font-body)" fontSize="12" fill="var(--color-text)" fontWeight="bold">4 m</text>
+          <text x="365" y="100" fontFamily="var(--font-body)" fontSize="12" fill="var(--color-text)" fontWeight="bold">Tinggi = ?</text>
+          <text x="80" y="195" fontFamily="var(--font-body)" fontSize="12" fill="var(--color-text)" textAnchor="middle" fontWeight="bold">3 m</text>
+          <text x="230" y="195" fontFamily="var(--font-body)" fontSize="12" fill="var(--color-text)" textAnchor="middle" fontWeight="bold">12 m</text>
+          <text x="70" y="130" fontFamily="var(--font-body)" fontSize="12" fill="#EF4444" fontWeight="bold" transform="rotate(-23 70 130)">5 m</text>
+          <text x="200" y="80" fontFamily="var(--font-body)" fontSize="12" fill="#EF4444" fontWeight="bold" transform="rotate(-23 200 80)">20 m</text>
+        </svg>
+      </div>
+    )
+  }
+  return null
+}
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 function getYoutubeEmbedId(url: string): string {
@@ -1142,7 +1220,9 @@ export default function MaterialContentPage() {
           sectionIndex: 2,
           sectionLabel: SECTION_LABELS[2],
           questionIndex: i,
-          questionText: q
+          questionText: (materialId === 2 && i === 0)
+            ? 'Unggah gambar/PDF ilustrasi kerangka atap'
+            : q
         })
       }
     })
@@ -1154,7 +1234,7 @@ export default function MaterialContentPage() {
         sectionIndex: 5,
         sectionLabel: SECTION_LABELS[5],
         questionIndex: 0,
-        questionText: 'Unggah laporan aktivitas (PDF atau Foto)'
+        questionText: 'Unggah laporan aktivitas (PDF)'
       })
     }
 
@@ -1166,7 +1246,9 @@ export default function MaterialContentPage() {
           sectionIndex: 6,
           sectionLabel: SECTION_LABELS[6],
           questionIndex: i,
-          questionText: q
+          questionText: (materialId === 1 && i === 3)
+            ? 'Unggah gambar/PDF rancangan atap'
+            : q
         })
       }
     })
@@ -1178,7 +1260,43 @@ export default function MaterialContentPage() {
         sectionIndex: 7,
         sectionLabel: SECTION_LABELS[7],
         questionIndex: 0,
-        questionText: 'Upload your challenge work here'
+        questionText: 'Unggah hasil challenge (PDF)'
+      })
+    }
+
+    // Section 8: Kuis questions
+    const kuisData = materi.kuis
+    kuisData.pertanyaan.forEach((q, i) => {
+      const val = answers[`8_${i}`]
+      if (!val || !val.trim()) {
+        unfilled.push({
+          sectionIndex: 8,
+          sectionLabel: SECTION_LABELS[8],
+          questionIndex: i,
+          questionText: q
+        })
+      }
+    })
+
+    // Section 8: Kuis File Upload
+    const val8File = answers[`8_${kuisData.pertanyaan.length}`]
+    if (!val8File || !val8File.trim()) {
+      unfilled.push({
+        sectionIndex: 8,
+        sectionLabel: SECTION_LABELS[8],
+        questionIndex: kuisData.pertanyaan.length,
+        questionText: 'Unggah lembar jawaban kuis (PDF atau Foto)'
+      })
+    }
+
+    // Section 9: Refleksi
+    const val9 = answers[`9_0`]
+    if (!val9 || !val9.trim()) {
+      unfilled.push({
+        sectionIndex: 9,
+        sectionLabel: SECTION_LABELS[9],
+        questionIndex: 0,
+        questionText: materi.refleksi
       })
     }
 
@@ -1302,12 +1420,26 @@ export default function MaterialContentPage() {
                 <p style={{ margin: '0 0 8px', fontWeight: 500 }}>
                   {renderTextWithLinks(q)}
                 </p>
-                <AnswerInput
-                  id={`answer-2-${i}`}
-                  disabled={isMaterialCompleted}
-                  value={answers[`2_${i}`] || ''}
-                  onChange={(val) => setAnswers(prev => ({ ...prev, [`2_${i}`]: val }))}
-                />
+                {materialId === 2 && i === 0 ? (
+                  <FileUploadArea
+                    id={`answer-2-${i}`}
+                    disabled={isMaterialCompleted}
+                    value={answers[`2_${i}`] || ''}
+                    onChange={(val) => setAnswers(prev => ({ ...prev, [`2_${i}`]: val }))}
+                    userId={user?.id || ''}
+                    materialId={materialId}
+                    sectionIndex={2}
+                    acceptType="all"
+                    instructionText="Unggah ilustrasi rancangan kerangka atap Anda di sini (PDF atau Foto):"
+                  />
+                ) : (
+                  <AnswerInput
+                    id={`answer-2-${i}`}
+                    disabled={isMaterialCompleted}
+                    value={answers[`2_${i}`] || ''}
+                    onChange={(val) => setAnswers(prev => ({ ...prev, [`2_${i}`]: val }))}
+                  />
+                )}
               </div>
             ))}
           </SectionCard>
@@ -1441,7 +1573,7 @@ export default function MaterialContentPage() {
         )
       case 7:
         return (
-          <SectionCard key="solutions" sectionRef={ref} icon={<IconBadge bg="#EBF7ED" color="#279827"><SealCheck size={22} /></IconBadge>} title="Solutions">
+          <SectionCard key="solutions" sectionRef={ref} icon={<IconBadge bg="#EBF7ED" color="#279827"><SealCheck size={22} /></IconBadge>} title="Solutions & Publishing">
             <ul style={{ margin: '0 0 24px', paddingLeft: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
               {m.solutions.map((s, i) => (
                 <li key={i} style={{ listStyleType: 'disc', marginLeft: 20 }}>{renderTextWithLinks(s)}</li>
@@ -1457,6 +1589,53 @@ export default function MaterialContentPage() {
               sectionIndex={7}
               acceptType="pdf"
               instructionText="Unggah hasil pengerjaan challenge Anda di sini dalam bentuk PDF:"
+            />
+          </SectionCard>
+        )
+      case 8: {
+        const kuisData = m.kuis
+        return (
+          <SectionCard key="kuis" sectionRef={ref} icon={<IconBadge bg="#FFEADB" color="#FF6A00"><SealCheck size={22} /></IconBadge>} title="Kuis">
+            <p style={{ margin: '0 0 12px', whiteSpace: 'pre-line' }}>{renderTextWithLinks(kuisData.deskripsi)}</p>
+            <KuisDiagram materialId={materialId} />
+            <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 24 }}>
+              {kuisData.pertanyaan.map((q, i) => (
+                <div key={i}>
+                  <p style={{ margin: '0 0 8px', fontWeight: 600 }}>{i + 1}. {renderTextWithLinks(q)}</p>
+                  <AnswerInput
+                    id={`answer-8-${i}`}
+                    disabled={isMaterialCompleted}
+                    value={answers[`8_${i}`] || ''}
+                    onChange={(val) => setAnswers(prev => ({ ...prev, [`8_${i}`]: val }))}
+                  />
+                </div>
+              ))}
+            </div>
+            <FileUploadArea
+              id={`answer-8-${kuisData.pertanyaan.length}`}
+              disabled={isMaterialCompleted}
+              value={answers[`8_${kuisData.pertanyaan.length}`] || ''}
+              onChange={(val) => setAnswers(prev => ({ ...prev, [`8_${kuisData.pertanyaan.length}`]: val }))}
+              userId={user?.id || ''}
+              materialId={materialId}
+              sectionIndex={8}
+              acceptType="all"
+              instructionText="Kerjakan dalam kertas lalu kumpulkan dalam bentuk foto/pdf di sini:"
+            />
+          </SectionCard>
+        )
+      }
+      case 9:
+        return (
+          <SectionCard key="refleksi" sectionRef={ref} icon={<IconBadge bg="#E4FBE9" color="#0EA933"><Info size={22} /></IconBadge>} title="Refleksi">
+            <p style={{ margin: '0 0 8px', fontWeight: 600 }}>
+              {renderTextWithLinks(m.refleksi)}
+            </p>
+            <AnswerInput
+              id="answer-9-0"
+              disabled={isMaterialCompleted}
+              value={answers['9_0'] || ''}
+              onChange={(val) => setAnswers(prev => ({ ...prev, '9_0': val }))}
             />
           </SectionCard>
         )
