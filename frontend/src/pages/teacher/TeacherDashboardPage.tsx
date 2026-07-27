@@ -149,7 +149,7 @@ export default function TeacherDashboardPage() {
   }
 
   return (
-    <div style={{ minHeight: 'calc(100svh - 80px)', backgroundColor: 'var(--color-background)', padding: '24px 32px' }}>
+    <div style={{ minHeight: 'calc(100svh - 144px)', backgroundColor: 'var(--color-background)', padding: '16px 32px 40px' }}>
       <div style={{ display: 'flex', width: '100%', gap: 32, maxWidth: 1400, margin: '0 auto', alignItems: 'flex-start' }}>
 
         {/* ── SIDEBAR ── */}

@@ -21,7 +21,7 @@ export default function MaterialLayout() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header materialTitle={materi?.judul} />
-      <main className="flex-1 pt-20">
+      <main className="flex-1 pt-28 md:pt-32">
         <Outlet />
       </main>
     </div>

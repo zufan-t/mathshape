@@ -185,21 +185,22 @@ export default function MaterialListPage() {
             style={{
               padding: isMobile ? '20px 24px' : '16px 32px',
               borderRadius: '20px',
-              backgroundColor: '#2D3748',
-              border: '1.5px solid #ffffff',
+              backgroundColor: 'var(--color-card-bg)',
+              border: '1.5px solid var(--color-border)',
               display: 'flex',
               flexDirection: isMobile ? 'column' : 'row',
               alignItems: 'center',
               justifyContent: isMobile ? 'center' : 'space-between',
               textAlign: isMobile ? 'center' : 'left',
               gap: 16,
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)',
             }}
           >
             <span style={{ 
               fontFamily: 'var(--font-body)', 
               fontSize: '16px', 
               fontWeight: 600, 
-              color: '#ffffff',
+              color: 'var(--color-text)',
               lineHeight: 1.5 
             }}>
               Login untuk mulai belajar dan menyimpan progres kamu.

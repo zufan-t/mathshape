@@ -12,7 +12,7 @@ export default function Layout() {
         - height: 60px desktop / 52px mobile
         = ~76px needed, use 80px for breathing room
       */}
-      <main className="flex-1 pt-20">
+      <main className="flex-1 pt-28 md:pt-32">
         <Outlet />
       </main>
       <Footer />

@@ -7,7 +7,7 @@ export default function TeacherLayout() {
       <TeacherHeader />
 
       {/* ─── Main Content (No Footer) ─── */}
-      <main className="flex-1 pt-20">
+      <main className="flex-1 pt-36">
         <Outlet />
       </main>
     </div>
