@@ -121,11 +121,11 @@ export default function LoginPage() {
           <h1 style={{
             fontFamily: 'var(--font-heading)', fontSize: '24px', fontWeight: 700,
             color: 'var(--color-text)', textAlign: 'center', marginBottom: '8px',
-          }}>{isTeacherPage ? 'Masuk Akun Guru' : 'Masuk'}</h1>
+          }}>Masuk</h1>
           <p style={{
             fontFamily: 'var(--font-body)', fontSize: '16px', color: 'var(--color-text-light)',
             textAlign: 'center', marginBottom: '28px', lineHeight: 1.6,
-          }}>{isTeacherPage ? 'Masukkan email dan kata sandi guru Anda' : 'Masukkan email dan kata sandi untuk melanjutkan'}</p>
+          }}>Masukkan email dan kata sandi untuk melanjutkan</p>
 
           {/* Banner: Email belum diverifikasi */}
           <AnimatePresence>

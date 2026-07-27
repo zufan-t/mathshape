@@ -156,13 +156,12 @@ export const MATERI_DATA: MateriPertemuan[] = [
       'Mengapa hasil pengukuran akan lebih akurat jika pengukuran tinggi benda and panjang bayangan dilakukan pada waktu yang sama?',
     ],
     theChallenge: {
-      deskripsi: 'Di lingkungan sekolah terdapat sebuah pohon besar yang tingginya belum diketahui. Pihak sekolah memerlukan informasi mengenai tinggi pohon tersebut untuk mendukung perawatan dan menjaga keamanan lingkungan sekolah. Namun, tinggi pohon tidak dapat diukur secara langsung karena keterbatasan alat ukur. Guru memberikan ilustrasi mengenai tinggi benda pembanding dan panjang bayangan yang terbentuk akibat sinar matahari. Berdasarkan informasi tersebut, tentukan tinggi pohon dengan memanfaatkan konsep kesebangunan segitiga. Sajikan proses penyelesaian, perhitungan, serta kesimpulan yang diperoleh secara sistematis.',
+      deskripsi:
+        'Di lingkungan sekolah terdapat sebuah pohon yang tingginya belum diketahui. Pihak sekolah memerlukan informasi mengenai tinggi pohon tersebut untuk mendukung perawatan dan menjaga keamanan lingkungan sekolah. Namun, tinggi pohon tidak dapat diukur secara langsung karena keterbatasan alat ukur.\n\nBerdasarkan ilustrasi pada Big Idea, tentukan tinggi pohon menggunakan konsep kesebangunan segitiga. Sajikan proses penyelesaian dan kesimpulan secara sistematis.',
       poin: [
-        'Amati ilustrasi yang diberikan.',
-        'Buat sketsa yang merepresentasikan situasi pada permasalahan.',
-        'Identifikasi segitiga-segitiga yang sebangun.',
+        'Buat sketsa yang merepresentasikan situasi pada ilustrasi.',
+        'Tentukan dua segitiga yang sebangun.',
         'Gunakan perbandingan sisi-sisi yang bersesuaian untuk menentukan tinggi pohon.',
-        'Jelaskan alasan penggunaan konsep kesebangunan segitiga dalam penyelesaian masalah.',
         'Tuliskan hasil perhitungan dan kesimpulan secara sistematis.',
       ],
     },

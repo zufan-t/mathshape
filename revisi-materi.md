@@ -248,3 +248,17 @@ Kegiatan Belajar 2
 2. Guiding Question ( Perubahan soal)
 3. Guiding Activity ( perubahan perintah dan link)
 4. Tambahan di akhir diberi reflection
+
+
+Revisi The Challenge Pertemuan 3
+The Challenge
+
+Di lingkungan sekolah terdapat sebuah pohon yang tingginya belum diketahui. Pihak sekolah memerlukan informasi mengenai tinggi pohon tersebut untuk mendukung perawatan dan menjaga keamanan lingkungan sekolah. Namun, tinggi pohon tidak dapat diukur secara langsung karena keterbatasan alat ukur.
+
+Berdasarkan ilustrasi pada Big Idea, tentukan tinggi pohon menggunakan konsep kesebangunan segitiga. Sajikan proses penyelesaian dan kesimpulan secara sistematis.
+
+Untuk menyelesaikan challenge ini, lakukan langkah-langkah berikut.
+1. Buat sketsa yang merepresentasikan situasi pada ilustrasi.
+2. Tentukan dua segitiga yang sebangun.
+3. Gunakan perbandingan sisi-sisi yang bersesuaian untuk menentukan tinggi pohon.
+4. Tuliskan hasil perhitungan dan kesimpulan secara sistematis.

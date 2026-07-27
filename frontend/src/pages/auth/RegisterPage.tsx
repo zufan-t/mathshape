@@ -182,7 +182,7 @@ export default function RegisterPage() {
             fontFamily: 'var(--font-heading)', fontSize: '24px', fontWeight: 700,
             color: 'var(--color-text)', textAlign: 'center', marginBottom: '28px',
           }}>
-            {isTeacherPage ? 'Daftar Akun Guru' : 'Daftar'}
+            Daftar
           </h1>
 
           {/* Global error */}

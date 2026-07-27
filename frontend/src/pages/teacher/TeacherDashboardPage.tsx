@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
-  Users,
   Notebook,
   MagnifyingGlass,
-  Student,
   Warning,
   CircleNotch,
   FilePdf,
@@ -37,6 +35,9 @@ export default function TeacherDashboardPage() {
   const userRole = user?.user_metadata?.role || 'student'
   const isTeacher = userRole === 'teacher'
 
+  // Sort View Mode: 'nama' or 'pertemuan'
+  const [sortBy, setSortBy] = useState<'nama' | 'pertemuan'>('nama')
+
   // States
   const [students, setStudents] = useState<StudentProfile[]>([])
   const [loadingStudents, setLoadingStudents] = useState(true)
@@ -46,7 +47,7 @@ export default function TeacherDashboardPage() {
   const [loadingAnswers, setLoadingAnswers] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 
-  // Route guard: only allow teachers
+  // Route guard: only allow logged-in teachers
   useEffect(() => {
     if (user === null) {
       navigate(ROUTES.LOGIN, { replace: true })
@@ -68,9 +69,6 @@ export default function TeacherDashboardPage() {
 
         if (error) throw error
         setStudents(data || [])
-        if (data && data.length > 0) {
-          setSelectedStudentId(data[0].id)
-        }
       } catch (err) {
         console.error('Error fetching students:', err)
       } finally {
@@ -102,7 +100,7 @@ export default function TeacherDashboardPage() {
         }
 
         const data: AnswerRow[] = await response.json()
-        
+
         // Convert to key-value record
         const answersMap: Record<string, string> = {}
         data.forEach((ans) => {
@@ -130,14 +128,14 @@ export default function TeacherDashboardPage() {
   const selectedStudent = students.find((s) => s.id === selectedStudentId)
   const currentMaterial = MATERI_DATA.find((m) => m.id === selectedMaterialId)
 
-  // Access Denied View
+  // Access Denied View if not teacher
   if (!isTeacher) {
     return (
       <div style={{ minHeight: 'calc(100svh - 80px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, backgroundColor: 'var(--color-background)' }}>
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          style={{ maxWidth: 460, textAlign: 'center', backgroundColor: 'var(--color-card-bg)', border: '1.5px solid var(--color-neutral-light)', padding: '40px 32px', borderRadius: 24 }}
+          style={{ maxWidth: 460, textAlign: 'center', backgroundColor: 'var(--color-card-bg)', border: '1.5px solid var(--color-border)', padding: '40px 32px', borderRadius: 24 }}
         >
           <Warning size={64} color="#EF4444" weight="fill" style={{ margin: '0 auto 20px' }} />
           <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 24, fontWeight: 700, color: 'var(--color-text)', margin: '0 0 12px' }}>Akses Ditolak</h1>
@@ -151,124 +149,209 @@ export default function TeacherDashboardPage() {
   }
 
   return (
-    <div style={{ minHeight: 'calc(100svh - 80px)', display: 'flex', backgroundColor: 'var(--color-background)' }}>
-      <div className="section-container" style={{ display: 'flex', width: '100%', gap: 24, paddingTop: 24, paddingBottom: 48, flexDirection: 'row' }}>
-        
-        {/* ── SIDEBAR: List of Students ── */}
-        <aside style={{
-          width: 300,
-          flexShrink: 0,
-          backgroundColor: 'var(--color-card-bg)',
-          borderRadius: 20,
-          border: '1.5px solid var(--color-neutral-light)',
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-          maxHeight: 'calc(100vh - 128px)',
-        }} className="teacher-sidebar">
-          
-          <div style={{ padding: 16, borderBottom: '1.5px solid var(--color-neutral-light)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <Users size={22} color="var(--color-text-light)" />
-              <span style={{ fontFamily: 'var(--font-heading)', fontSize: 16, fontWeight: 700, color: 'var(--color-text)' }}>
-                Daftar Siswa ({students.length})
-              </span>
-            </div>
-            
-            {/* Search Box */}
-            <div style={{ position: 'relative' }}>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari nama atau email..."
-                style={{
-                  width: '100%',
-                  padding: '10px 12px 10px 36px',
-                  borderRadius: 12,
-                  border: '1.5px solid var(--color-neutral-light)',
-                  backgroundColor: 'var(--color-background)',
-                  color: 'var(--color-text)',
-                  fontFamily: 'var(--font-body)',
-                  fontSize: 14,
-                  outline: 'none',
-                }}
-              />
-              <MagnifyingGlass size={18} color="#9CA3AF" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
-            </div>
+    <div style={{ minHeight: 'calc(100svh - 80px)', backgroundColor: 'var(--color-background)', padding: '24px 32px' }}>
+      <div style={{ display: 'flex', width: '100%', gap: 32, maxWidth: 1400, margin: '0 auto', alignItems: 'flex-start' }}>
+
+        {/* ── SIDEBAR ── */}
+        <aside
+          style={{
+            width: 320,
+            flexShrink: 0,
+            backgroundColor: 'var(--color-card-bg)',
+            borderRadius: 24,
+            border: '1.5px solid var(--color-border)',
+            padding: '24px 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 16,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+          }}
+          className="teacher-sidebar"
+        >
+          {/* Header text */}
+          <h3
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: 16,
+              fontWeight: 700,
+              color: 'var(--color-text)',
+              textAlign: 'center',
+              margin: 0,
+            }}
+          >
+            Urutkan berdasarkan
+          </h3>
+
+          {/* Toggle buttons: Nama / Pertemuan */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <button
+              onClick={() => setSortBy('nama')}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                borderRadius: 9999,
+                fontFamily: 'var(--font-body)',
+                fontSize: 15,
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 200ms',
+                backgroundColor: sortBy === 'nama' ? '#007BFF' : 'transparent',
+                color: sortBy === 'nama' ? '#ffffff' : 'var(--color-text)',
+                border: sortBy === 'nama' ? 'none' : '1.5px solid var(--color-border)',
+              }}
+            >
+              Nama
+            </button>
+            <button
+              onClick={() => setSortBy('pertemuan')}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                borderRadius: 9999,
+                fontFamily: 'var(--font-body)',
+                fontSize: 15,
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 200ms',
+                backgroundColor: sortBy === 'pertemuan' ? '#007BFF' : 'transparent',
+                color: sortBy === 'pertemuan' ? '#ffffff' : 'var(--color-text)',
+                border: sortBy === 'pertemuan' ? 'none' : '1.5px solid var(--color-border)',
+              }}
+            >
+              Pertemuan
+            </button>
           </div>
 
-          {/* Student list scrollable container */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: 8 }}>
+          {/* Search Bar */}
+          <div style={{ position: 'relative', marginTop: 4 }}>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search"
+              style={{
+                width: '100%',
+                padding: '10px 16px 10px 42px',
+                borderRadius: 9999,
+                border: '1.5px solid var(--color-border)',
+                backgroundColor: 'var(--color-input-bg)',
+                color: 'var(--color-text)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 15,
+                outline: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
+            <MagnifyingGlass
+              size={20}
+              color="#9CA3AF"
+              style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)' }}
+            />
+          </div>
+
+          {/* Divider */}
+          <div style={{ borderBottom: '1.5px solid var(--color-border)' }} />
+
+          {/* Student List */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, overflowY: 'auto', maxHeight: 'calc(100vh - 360px)' }}>
             {loadingStudents ? (
-              <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '24px 0' }}>
                 <CircleNotch className="animate-spin" size={24} color="#007BFF" />
               </div>
-            ) : filteredStudents.length === 0 ? (
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--color-text-light)', textAlign: 'center', padding: '24px 8px', margin: 0 }}>
-                Tidak ada siswa ditemukan
-              </p>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {filteredStudents.map((s) => {
+            ) : sortBy === 'nama' ? (
+              /* VIEW BY NAMA */
+              filteredStudents.length === 0 ? (
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--color-text-light)', padding: '12px 0', margin: 0 }}>
+                  Tidak ada siswa ditemukan
+                </p>
+              ) : (
+                filteredStudents.map((s) => {
                   const isSelected = s.id === selectedStudentId
                   return (
                     <button
                       key={s.id}
                       onClick={() => setSelectedStudentId(s.id)}
                       style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 12,
-                        width: '100%',
-                        padding: '12px 16px',
-                        borderRadius: 12,
+                        background: 'none',
                         border: 'none',
                         textAlign: 'left',
-                        backgroundColor: isSelected ? 'var(--color-primary-light)' : 'transparent',
+                        padding: '6px 4px',
                         cursor: 'pointer',
-                        transition: 'background-color 200ms',
+                        fontFamily: 'var(--font-body)',
+                        fontSize: 16,
+                        fontWeight: isSelected ? 700 : 500,
+                        color: isSelected ? '#007BFF' : 'var(--color-text)',
+                        transition: 'color 150ms',
                       }}
-                      className={isSelected ? '' : 'hover:bg-black/5 dark:hover:bg-white/5'}
                     >
-                      <div style={{
-                        width: 36,
-                        height: 36,
-                        borderRadius: '50%',
-                        backgroundColor: isSelected ? '#007BFF' : 'var(--color-neutral-light)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                      }}>
-                        <Student size={20} color={isSelected ? '#ffffff' : 'var(--color-text)'} />
-                      </div>
-                      <div style={{ overflow: 'hidden' }}>
-                        <p style={{
-                          fontFamily: 'var(--font-body)',
-                          fontSize: 14,
-                          fontWeight: isSelected ? 700 : 500,
-                          color: isSelected ? '#007BFF' : 'var(--color-text)',
-                          margin: 0,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}>
-                          {s.full_name}
-                        </p>
-                        <p style={{
-                          fontFamily: 'var(--font-body)',
-                          fontSize: 11,
-                          color: 'var(--color-text-light)',
-                          margin: 0,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}>
-                          {s.email}
-                        </p>
-                      </div>
+                      {s.full_name}
                     </button>
+                  )
+                })
+              )
+            ) : (
+              /* VIEW BY PERTEMUAN */
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {[1, 2, 3].map((pNum) => {
+                  const isCurrentGroupActive = selectedMaterialId === pNum
+                  return (
+                    <div key={pNum} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {/* Pertemuan Header / Pill */}
+                      <button
+                        onClick={() => {
+                          setSelectedMaterialId(pNum)
+                        }}
+                        style={{
+                          width: '100%',
+                          padding: '10px 16px',
+                          borderRadius: 12,
+                          textAlign: 'left',
+                          fontFamily: 'var(--font-heading)',
+                          fontSize: 15,
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          backgroundColor: isCurrentGroupActive ? '#22C55E' : 'transparent',
+                          color: isCurrentGroupActive ? '#ffffff' : 'var(--color-text)',
+                          border: isCurrentGroupActive ? 'none' : 'none',
+                          transition: 'all 200ms',
+                        }}
+                      >
+                        Pertemuan {pNum}
+                      </button>
+
+                      {/* List of Students under Pertemuan */}
+                      {isCurrentGroupActive && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingLeft: 12 }}>
+                          {filteredStudents.map((s) => {
+                            const isSelected = s.id === selectedStudentId && selectedMaterialId === pNum
+                            return (
+                              <button
+                                key={s.id}
+                                onClick={() => {
+                                  setSelectedStudentId(s.id)
+                                  setSelectedMaterialId(pNum)
+                                }}
+                                style={{
+                                  background: 'none',
+                                  border: 'none',
+                                  textAlign: 'left',
+                                  padding: '4px 0',
+                                  cursor: 'pointer',
+                                  fontFamily: 'var(--font-body)',
+                                  fontSize: 15,
+                                  fontWeight: isSelected ? 700 : 500,
+                                  color: isSelected ? '#007BFF' : 'var(--color-text)',
+                                  transition: 'color 150ms',
+                                }}
+                              >
+                                {s.full_name}
+                              </button>
+                            )
+                          })}
+                          <div style={{ borderBottom: '1.5px solid var(--color-border)', marginTop: 8 }} />
+                        </div>
+                      )}
+                    </div>
                   )
                 })}
               </div>
@@ -276,96 +359,137 @@ export default function TeacherDashboardPage() {
           </div>
         </aside>
 
-        {/* ── MAIN AREA: Student Answers ── */}
-        <main style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20 }}>
-          
-          {/* Materials selector bar */}
-          <div style={{
-            backgroundColor: 'var(--color-card-bg)',
-            borderRadius: 20,
-            border: '1.5px solid var(--color-neutral-light)',
-            padding: 16,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 16,
-            flexWrap: 'wrap',
-          }}>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {MATERI_DATA.map((m) => {
-                const isSelected = m.id === selectedMaterialId
-                return (
-                  <button
-                    key={m.id}
-                    onClick={() => setSelectedMaterialId(m.id)}
-                    style={{
-                      fontFamily: 'var(--font-body)',
-                      fontSize: 14,
-                      fontWeight: 600,
-                      padding: '8px 16px',
-                      borderRadius: 10,
-                      border: 'none',
-                      cursor: 'pointer',
-                      backgroundColor: isSelected ? '#007BFF' : 'transparent',
-                      color: isSelected ? '#ffffff' : 'var(--color-text)',
-                      transition: 'all 200ms',
-                    }}
-                    className={isSelected ? '' : 'hover:bg-black/5 dark:hover:bg-white/5'}
-                  >
-                    Pertemuan {m.id}
-                  </button>
-                )
-              })}
+        {/* ── MAIN CONTENT AREA ── */}
+        <main style={{ flex: 1, minWidth: 0 }}>
+          {!selectedStudentId || !selectedStudent ? (
+            /* UNSELECTED STATE: "Pilih nama" */
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '60vh',
+                backgroundColor: 'transparent',
+              }}
+            >
+              <h2
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: 28,
+                  fontWeight: 700,
+                  color: '#6B7280',
+                  margin: 0,
+                }}
+              >
+                Pilih nama
+              </h2>
             </div>
-            
-            {selectedStudent && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--color-text-light)' }}>
-                <span style={{ fontSize: 13, fontWeight: 500 }}>Meninjau:</span>
-                <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text)' }}>
-                  {selectedStudent.full_name}
-                </span>
-              </div>
-            )}
-          </div>
+          ) : (
+            /* SELECTED STUDENT STATE */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
-          {/* Answers view */}
-          <div style={{ flex: 1 }}>
-            <AnimatePresence mode="wait">
+              {/* Student Header */}
+              <div>
+                <h1
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: 28,
+                    fontWeight: 700,
+                    color: 'var(--color-text)',
+                    margin: 0,
+                  }}
+                >
+                  {selectedStudent.full_name}
+                </h1>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 15,
+                    color: 'var(--color-text-light)',
+                    margin: '4px 0 0 0',
+                  }}
+                >
+                  {selectedStudent.email}
+                </p>
+              </div>
+
+              {/* Section Header depending on sortBy view */}
+              {sortBy === 'nama' ? (
+                /* BY NAMA: Centered "Pertemuan" + 3 Pill Buttons (1, 2, 3) */
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+                  <h3
+                    style={{
+                      fontFamily: 'var(--font-heading)',
+                      fontSize: 18,
+                      fontWeight: 700,
+                      color: 'var(--color-text)',
+                      margin: 0,
+                    }}
+                  >
+                    Pertemuan
+                  </h3>
+
+                  <div style={{ display: 'flex', gap: 16, width: '100%', maxWidth: 700, justifyContent: 'center' }}>
+                    {[1, 2, 3].map((pNum) => {
+                      const isSelected = selectedMaterialId === pNum
+                      return (
+                        <button
+                          key={pNum}
+                          onClick={() => setSelectedMaterialId(pNum)}
+                          style={{
+                            flex: 1,
+                            padding: '12px 24px',
+                            borderRadius: 9999,
+                            fontFamily: 'var(--font-body)',
+                            fontSize: 16,
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            transition: 'all 200ms',
+                            backgroundColor: isSelected ? '#007BFF' : 'transparent',
+                            color: isSelected ? '#ffffff' : 'var(--color-text)',
+                            border: isSelected ? 'none' : '1.5px solid var(--color-border)',
+                          }}
+                        >
+                          {pNum}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ) : (
+                /* BY PERTEMUAN: Centered "Pertemuan X" title */
+                <div style={{ textAlign: 'center' }}>
+                  <h3
+                    style={{
+                      fontFamily: 'var(--font-heading)',
+                      fontSize: 20,
+                      fontWeight: 700,
+                      color: 'var(--color-text)',
+                      margin: 0,
+                    }}
+                  >
+                    Pertemuan {selectedMaterialId}
+                  </h3>
+                </div>
+              )}
+
+              {/* Horizontal Divider Line */}
+              <div style={{ borderBottom: '1.5px solid var(--color-border)', width: '100%' }} />
+
+              {/* Answers Content View */}
               {loadingAnswers ? (
                 <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0' }}>
                   <CircleNotch className="animate-spin" size={32} color="#007BFF" />
                 </div>
-              ) : !selectedStudentId ? (
-                <div style={{ textAlign: 'center', padding: '60px 24px', backgroundColor: 'var(--color-card-bg)', borderRadius: 20, border: '1.5px solid var(--color-neutral-light)' }}>
-                  <Users size={48} color="var(--color-text-light)" style={{ margin: '0 auto 16px' }} />
-                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 16, color: 'var(--color-text-light)', margin: 0 }}>
-                    Silakan pilih siswa dari bilah samping untuk meninjau jawaban.
-                  </p>
-                </div>
               ) : currentMaterial ? (
                 <motion.div
                   key={`${selectedStudentId}_${selectedMaterialId}`}
-                  initial={{ opacity: 0, y: 15 }}
+                  initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -15 }}
-                  transition={{ duration: 0.25 }}
+                  transition={{ duration: 0.2 }}
                   style={{ display: 'flex', flexDirection: 'column', gap: 24 }}
                 >
-                  <div style={{
-                    backgroundColor: '#007BFF',
-                    borderRadius: 20,
-                    padding: 24,
-                    color: '#ffffff',
-                  }}>
-                    <p style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', opacity: 0.8, margin: '0 0 4px' }}>
-                      {currentMaterial.pertemuanLabel}
-                    </p>
-                    <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 24, fontWeight: 700, color: '#ffffff', margin: 0 }}>
-                      {currentMaterial.judul}
-                    </h2>
-                  </div>
-
-                  {/* Grouped sections */}
+                  {/* Render sections for current material */}
                   {[
                     { title: 'Essential Questions', key: 'essentialQuestions', secIdx: 2, type: 'text', items: currentMaterial.essentialQuestions },
                     { title: 'Guiding Activities', key: 'guidingActivities', secIdx: 5, type: 'file', items: ['Upload Laporan Aktivitas (PDF)'] },
@@ -373,65 +497,70 @@ export default function TeacherDashboardPage() {
                     { title: 'Solutions & Publishing', key: 'solutions', secIdx: 7, type: 'file', items: ['Upload Hasil Challenge (PDF)'] },
                     { title: 'Kuis', key: 'kuis', secIdx: 8, type: 'text', items: [...currentMaterial.kuis.pertanyaan, 'Upload Kuis (PDF/Foto)'] },
                     { title: 'Refleksi', key: 'refleksi', secIdx: 9, type: 'text', items: [currentMaterial.refleksi] },
-                  ].map((sec) => {
-                    return (
-                      <div
-                        key={sec.key}
+                  ].map((sec) => (
+                    <div
+                      key={sec.key}
+                      style={{
+                        backgroundColor: 'var(--color-card-bg)',
+                        borderRadius: 20,
+                        border: '1.5px solid var(--color-border)',
+                        padding: 24,
+                        boxShadow: '0 2px 12px rgba(0,0,0,0.03)',
+                      }}
+                    >
+                      <h4
                         style={{
-                          backgroundColor: 'var(--color-card-bg)',
-                          borderRadius: 20,
-                          border: '1.5px solid var(--color-neutral-light)',
-                          padding: 24,
-                        }}
-                      >
-                        <h3 style={{
                           fontFamily: 'var(--font-heading)',
                           fontSize: 18,
                           fontWeight: 700,
                           color: 'var(--color-text)',
-                          borderBottom: '1.5px solid var(--color-neutral-light)',
+                          borderBottom: '1.5px solid var(--color-border)',
                           paddingBottom: 10,
                           marginBottom: 16,
                           display: 'flex',
                           alignItems: 'center',
-                          gap: 8,
-                        }}>
-                          <Notebook size={20} color="#007BFF" />
-                          {sec.title}
-                        </h3>
+                          gap: 10,
+                        }}
+                      >
+                        <Notebook size={22} color="#007BFF" />
+                        {sec.title}
+                      </h4>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                          {sec.items.map((prompt, qIdx) => {
-                            const answerKey = `${sec.secIdx}_${qIdx}`
-                            const answerText = answers[answerKey]
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                        {sec.items.map((prompt, qIdx) => {
+                          const answerKey = `${sec.secIdx}_${qIdx}`
+                          const answerText = answers[answerKey]
 
-                            const isFile = sec.type === 'file' || 
-                              (sec.secIdx === 6 && selectedMaterialId === 1 && qIdx === 3) ||
-                              (sec.secIdx === 2 && selectedMaterialId === 2 && qIdx === 0) ||
-                              (sec.secIdx === 8 && qIdx === currentMaterial.kuis.pertanyaan.length)
-                            let fileObj: { fileName: string; fileSize: number; fileType: string; fileData?: string; fileUrl?: string; filePath?: string } | null = null
-                            if (isFile && answerText) {
-                              try {
-                                fileObj = JSON.parse(answerText)
-                              } catch (e) {
-                                // Treat as raw text
-                              }
+                          const isFile =
+                            sec.type === 'file' ||
+                            (sec.secIdx === 6 && selectedMaterialId === 1 && qIdx === 3) ||
+                            (sec.secIdx === 2 && selectedMaterialId === 2 && qIdx === 0) ||
+                            (sec.secIdx === 8 && qIdx === currentMaterial.kuis.pertanyaan.length)
+
+                          let fileObj: { fileName: string; fileSize: number; fileType: string; fileData?: string; fileUrl?: string } | null = null
+                          if (isFile && answerText) {
+                            try {
+                              fileObj = JSON.parse(answerText)
+                            } catch (e) {
+                              // Fallback to raw text
                             }
+                          }
 
-                            const formatSize = (bytes: number) => {
-                              if (!bytes || bytes === 0) return '0 B'
-                              const k = 1024
-                              const sizes = ['B', 'KB', 'MB']
-                              const i = Math.floor(Math.log(bytes) / Math.log(k))
-                              return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
-                            }
+                          const formatSize = (bytes: number) => {
+                            if (!bytes || bytes === 0) return '0 B'
+                            const k = 1024
+                            const sizes = ['B', 'KB', 'MB']
+                            const i = Math.floor(Math.log(bytes) / Math.log(k))
+                            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
+                          }
 
-                            return (
-                              <div key={qIdx} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                                <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                                  <span style={{
+                          return (
+                            <div key={qIdx} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                              <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                                <span
+                                  style={{
                                     fontFamily: 'var(--font-body)',
-                                    fontSize: 14,
+                                    fontSize: 13,
                                     fontWeight: 700,
                                     color: '#007BFF',
                                     backgroundColor: 'var(--color-primary-light)',
@@ -443,122 +572,98 @@ export default function TeacherDashboardPage() {
                                     justifyContent: 'center',
                                     flexShrink: 0,
                                     marginTop: 2,
-                                  }}>
-                                    {qIdx + 1}
-                                  </span>
-                                  <p style={{
+                                  }}
+                                >
+                                  {qIdx + 1}
+                                </span>
+                                <p
+                                  style={{
                                     fontFamily: 'var(--font-body)',
                                     fontSize: 15,
                                     color: 'var(--color-text)',
                                     margin: 0,
                                     lineHeight: 1.5,
                                     fontWeight: 500,
-                                  }}>
-                                    {prompt}
-                                  </p>
-                                </div>
+                                  }}
+                                >
+                                  {prompt}
+                                </p>
+                              </div>
 
-                                {/* Student Answer Box */}
-                                <div style={{
+                              {/* Student Answer Box */}
+                              <div
+                                style={{
                                   backgroundColor: 'var(--color-background)',
-                                  borderRadius: 12,
-                                  border: '1.5px solid var(--color-neutral-light)',
+                                  borderRadius: 14,
+                                  border: '1.5px solid var(--color-border)',
                                   padding: '14px 18px',
                                   marginTop: 4,
-                                  position: 'relative',
-                                }}>
-                                  {isFile ? (
-                                    fileObj ? (
-                                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
-                                          {fileObj.fileType.includes('pdf') ? (
-                                            <div style={{ color: '#EF4444', display: 'flex' }}><FilePdf size={28} weight="fill" /></div>
-                                          ) : (
-                                            <div style={{ color: '#10B981', display: 'flex' }}><Image size={28} weight="fill" /></div>
-                                          )}
-                                          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                                            <span style={{
-                                              fontFamily: 'var(--font-body)',
-                                              fontSize: 14,
-                                              fontWeight: 600,
-                                              color: 'var(--color-text)',
-                                              whiteSpace: 'nowrap',
-                                              overflow: 'hidden',
-                                              textOverflow: 'ellipsis'
-                                            }}>
-                                              {fileObj.fileName}
-                                            </span>
-                                            <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--color-text-light)' }}>
-                                              {formatSize(fileObj.fileSize)}
-                                            </span>
-                                          </div>
+                                }}
+                              >
+                                {isFile ? (
+                                  fileObj ? (
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+                                        {fileObj.fileType.includes('pdf') ? (
+                                          <div style={{ color: '#EF4444', display: 'flex' }}><FilePdf size={28} weight="fill" /></div>
+                                        ) : (
+                                          <div style={{ color: '#10B981', display: 'flex' }}><Image size={28} weight="fill" /></div>
+                                        )}
+                                        <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                                          <span style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600, color: 'var(--color-text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                            {fileObj.fileName}
+                                          </span>
+                                          <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--color-text-light)' }}>
+                                            {formatSize(fileObj.fileSize)}
+                                          </span>
                                         </div>
-                                        <a
-                                          href={fileObj.fileUrl || fileObj.fileData}
-                                          download={fileObj.fileName}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          style={{
-                                            fontSize: 13,
-                                            fontWeight: 600,
-                                            color: '#007BFF',
-                                            textDecoration: 'none',
-                                            padding: '6px 12px',
-                                            borderRadius: 8,
-                                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                                            transition: 'background-color 200ms'
-                                          }}
-                                          onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(0, 123, 255, 0.2)'}
-                                          onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(0, 123, 255, 0.1)'}
-                                        >
-                                          Unduh / Buka
-                                        </a>
                                       </div>
-                                    ) : (
-                                      <p style={{
-                                        fontFamily: 'var(--font-body)',
-                                        fontSize: 14,
-                                        fontStyle: 'italic',
-                                        color: '#9CA3AF',
-                                        margin: 0,
-                                      }}>
-                                        Belum ada file diunggah oleh siswa
-                                      </p>
-                                    )
-                                  ) : answerText ? (
-                                    <p style={{
-                                      fontFamily: 'var(--font-body)',
-                                      fontSize: 15,
-                                      color: 'var(--color-text)',
-                                      margin: 0,
-                                      lineHeight: 1.6,
-                                      whiteSpace: 'pre-wrap',
-                                    }}>
-                                      {answerText}
-                                    </p>
+                                      <a
+                                        href={fileObj.fileUrl || fileObj.fileData}
+                                        download={fileObj.fileName}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{
+                                          fontSize: 13,
+                                          fontWeight: 600,
+                                          color: '#007BFF',
+                                          textDecoration: 'none',
+                                          padding: '6px 14px',
+                                          borderRadius: 8,
+                                          backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                                          transition: 'background-color 200ms',
+                                        }}
+                                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(0, 123, 255, 0.2)')}
+                                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(0, 123, 255, 0.1)')}
+                                      >
+                                        Unduh / Buka
+                                      </a>
+                                    </div>
                                   ) : (
-                                    <p style={{
-                                      fontFamily: 'var(--font-body)',
-                                      fontSize: 14,
-                                      fontStyle: 'italic',
-                                      color: '#9CA3AF',
-                                      margin: 0,
-                                    }}>
-                                      Belum ada jawaban dari siswa
+                                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontStyle: 'italic', color: '#9CA3AF', margin: 0 }}>
+                                      Belum ada file diunggah oleh siswa
                                     </p>
-                                  )}
-                                </div>
+                                  )
+                                ) : answerText ? (
+                                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 15, color: 'var(--color-text)', margin: 0, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                                    {answerText}
+                                  </p>
+                                ) : (
+                                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontStyle: 'italic', color: '#9CA3AF', margin: 0 }}>
+                                    Belum ada jawaban dari siswa
+                                  </p>
+                                )}
                               </div>
-                            )
-                          })}
-                        </div>
+                            </div>
+                          )
+                        })}
                       </div>
-                    )
-                  })}
+                    </div>
+                  ))}
                 </motion.div>
               ) : null}
-            </AnimatePresence>
-          </div>
+            </div>
+          )}
         </main>
       </div>
 
