@@ -1457,7 +1457,7 @@ export default function MaterialContentPage() {
             <p style={{ margin: '0 0 12px', whiteSpace: 'pre-line' }}>{renderTextWithLinks(m.theChallenge.deskripsi)}</p>
             {m.theChallenge.poin.length > 0 && (
               <ul style={{ margin: '0 0 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {m.theChallenge.poin.map((p, i) => <li key={i}>{renderTextWithLinks(p)}</li>)}
+                {m.theChallenge.poin.map((p, i) => <li key={i} style={{ whiteSpace: 'pre-line' }}>{renderTextWithLinks(p)}</li>)}
               </ul>
             )}
             <div style={{

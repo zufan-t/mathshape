@@ -44,11 +44,13 @@ export const MATERI_DATA: MateriPertemuan[] = [
       'Bagaimana para tukang bangunan memastikan setiap sudut pada rangka atap presisi agar mampu menahan beban ribuan genteng yang berat?',
     ],
     theChallenge: {
-      deskripsi: 'Kamu adalah seorang arsitek yang diminta untuk merancang kerangka atap perumahan. Ada beberapa syarat yang harus kamu penuhi dalam merancang kerangka atap perumahan.',
+      deskripsi:
+        'Kamu adalah seorang arsitek yang bertugas merancang kerangka atap perumahan. Agar struktur atap kokoh dan beban terbagi secara merata, kamu harus menerapkan prinsip kedudukan garis dan sudut dengan tepat.\n\nTantangan:\nBuatlah rancangan kerangka atap yang memuat:',
       poin: [
-        'Dua batang utama yang sejajar (sebagai tumpuan bawah/plafon).',
-        'Dua batang transversal (diagonal) yang memotong tumpuan tersebut.',
-        'Kamu harus menunjukkan kepada tukang bangunan bahwa sudut-sudut sehadap pada sambungan baut memiliki besar yang sama agar beban terbagi rata!',
+        '2 batang utama yang saling sejajar (sebagai tumpuan bawah/plafon).',
+        '1 batang transversal (diagonal) yang memotong kedua tumpuan sejajar tersebut.',
+        'Beri nama setiap sudut yang terbentuk pada rancanganmu.',
+        'Identifikasi pasangan sudut berdasarkan hubungan berikut:\n   • sudut sehadap,\n   • sudut berseberangan,\n   • sudut bertolak belakang,\n   • sudut sepihak,\n   • sudut berpelurus.',
       ],
     },
     guidingActivities: [

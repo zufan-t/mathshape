@@ -32,13 +32,19 @@ Bagaimana para tukang bangunan memastikan setiap sudut pada rangka atap presisi 
 
 The Challenge 
 
-Kamu adalah seorang arsitek yang diminta untuk merancang kerangka atap perumahan. Ada beberapa syarat yang harus kamu penuhi dalam merancang kerangka atap perumahan. 
+Kamu adalah seorang arsitek yang bertugas merancang kerangka atap perumahan. Agar struktur atap kokoh dan beban terbagi secara merata, kamu harus menerapkan prinsip kedudukan garis dan sudut dengan tepat.
 
-Dua batang utama yang sejajar (sebagai tumpuan bawah/plafon). 
-
-Dua batang transversal (diagonal) yang memotong tumpuan tersebut. 
-
-Kamu harus menunjukkan kepada tukang bangunan bahwa sudut-sudut sehadap pada sambungan baut memiliki besar yang sama agar beban terbagi rata! 
+Tantangan:
+Buatlah rancangan kerangka atap yang memuat:
+1. 2 batang utama yang saling sejajar (sebagai tumpuan bawah/plafon).
+2. 1 batang transversal (diagonal) yang memotong kedua tumpuan sejajar tersebut.
+3. Beri nama setiap sudut yang terbentuk pada rancanganmu.
+4. Identifikasi pasangan sudut berdasarkan hubungan berikut:
+   • sudut sehadap, 
+   • sudut berseberangan, 
+   • sudut bertolak belakang, 
+   • sudut sepihak, 
+   • sudut berpelurus. 
 
 Guiding Resources 
 
