@@ -104,7 +104,7 @@ export const MATERI_DATA: MateriPertemuan[] = [
     ],
     theChallenge: {
       deskripsi:
-        'Gambarlah dua garis sejajar yang dipotong oleh satu garis miring (garis transversal) dapat menggunakan gambar pada pertemuan pertama, jika gambar sudah sesuai. Tentukan sendiri besar salah satu sudutnya, kemudian tentukan besar sudut-sudut lainnya. Jelaskan mengapa sudut-sudut tersebut memiliki besar yang sama atau berbeda berdasarkan hubungan sudut pada dua garis sejajar.',
+        'Gambarlah dua garis sejajar yang dipotong oleh satu garis miring (garis transversal) dapat menggunakan gambar pada pertemuan pertama, jika gambar sudah sesuai.Tentukan sendiri besar salah satu sudutnya, kemudian tentukan besar sudut-sudut lainnya. Jelaskan mengapa sudut-sudut tersebut memiliki besar yang sama atau berbeda berdasarkan hubungan sudut pada dua garis sejajar.',
       poin: [],
     },
     guidingActivities: [
