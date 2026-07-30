@@ -1542,7 +1542,7 @@ export default function MaterialContentPage() {
               acceptType="pdf"
               instructionText={
                 materialId === 1
-                  ? "Selesaikan langkah 1–7 di atas, lalu unggah laporan/bukti pengerjaan Anda di sini dalam bentuk PDF:"
+                  ? "Selesaikan langkah 1–6 di atas, lalu unggah laporan/bukti pengerjaan Anda di sini dalam bentuk PDF:"
                   : "Unggah hasil pengerjaan aktivitas Anda di sini dalam bentuk PDF:"
               }
             />

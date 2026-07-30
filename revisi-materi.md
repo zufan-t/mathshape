@@ -62,19 +62,21 @@ Gambarkan rancangan atapmu secara rapi! Berikan label nama sudut  agar para tuka
 
 Guiding Activities 
 
+Link: https://www.geogebra.org/m/uHuMhQUH 
+
 Gunakan aplikasi GeoGebra (versi web/aplikasi) untuk melakukan eksplorasi berikut: 
 
-Buat dua garis sejajar menggunakan tool Line dan pastikan sejajar dengan tool Parallel Line. 
+1. Buat dua garis sejajar menggunakan tool Line dan pastikan sejajar dengan tool Parallel Line. 
 
-Buat satu garis transversal yang memotong kedua garis sejajar tersebut. 
+2. Buat satu garis transversal yang memotong kedua garis sejajar tersebut. 
 
-Tandai titik-titik perpotongan, lalu gunakan tool Angle untuk mengukur seluruh sudut yang terbentuk pada kedua titik perpotongan (akan ada 8 sudut). 
+3. Tandai titik-titik perpotongan, lalu gunakan tool Angle untuk mengukur seluruh sudut yang terbentuk pada kedua titik perpotongan (akan ada 8 sudut). 
 
-Catat pasangan sudut yang besarnya sama dan kelompokkan berdasarkan jenis hubungannya (sehadap, dalam berseberangan, luar berseberangan, atau berpelurus). 
+4. Catat pasangan sudut yang besarnya sama dan kelompokkan berdasarkan jenis hubungannya (sehadap, dalam berseberangan, luar berseberangan, luar sepihak, dalam sepihak). 
 
-Geser (drag) garis transversal untuk mengubah kemiringannya, lalu amati apakah hubungan antarsudut yang sudah kamu kelompokkan tadi tetap berlaku atau berubah. 
+5. Geser (drag) garis transversal untuk mengubah kemiringannya, lalu amati apakah hubungan antarsudut yang sudah kamu kelompokkan tadi tetap berlaku atau berubah. 
 
-Ambil tangkapan layar (screenshot) hasil eksplorasimu sebagai bukti untuk mendukung jawaban pada Guiding Questions dan Solution. 
+6. Ambil tangkapan layar (screenshot) hasil eksplorasimu sebagai bukti untuk mendukung jawaban pada Guiding Questions dan Solution. 
 
 Solutions 
 

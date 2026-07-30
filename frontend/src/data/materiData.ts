@@ -58,7 +58,7 @@ export const MATERI_DATA: MateriPertemuan[] = [
       'Buat dua garis sejajar menggunakan tool Line dan pastikan sejajar dengan tool Parallel Line.',
       'Buat satu garis transversal yang memotong kedua garis sejajar tersebut.',
       'Tandai titik-titik perpotongan, lalu gunakan tool Angle untuk mengukur seluruh sudut yang terbentuk pada kedua titik perpotongan (akan ada 8 sudut).',
-      'Catat pasangan sudut yang besarnya sama dan kelompokkan berdasarkan jenis hubungannya (sehadap, dalam berseberangan, luar berseberangan, atau berpelurus).',
+      'Catat pasangan sudut yang besarnya sama dan kelompokkan berdasarkan jenis hubungannya (sehadap, dalam berseberangan, luar berseberangan, luar sepihak, dalam sepihak).',
       'Geser (drag) garis transversal untuk mengubah kemiringannya, lalu amati apakah hubungan antarsudut yang sudah kamu kelompokkan tadi tetap berlaku atau berubah.',
       'Ambil tangkapan layar (screenshot) hasil eksplorasimu sebagai bukti untuk mendukung jawaban pada Guiding Questions dan Solution.',
     ],
