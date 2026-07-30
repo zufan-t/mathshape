@@ -11,7 +11,7 @@ export default function AuthLayout() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1 pt-20">
+      <main style={{ flex: 1, paddingTop: '110px' }}>
         <Outlet />
       </main>
       <Footer />

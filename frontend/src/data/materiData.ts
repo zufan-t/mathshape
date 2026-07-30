@@ -103,10 +103,9 @@ export const MATERI_DATA: MateriPertemuan[] = [
       'Bagaimana kalian bisa yakin bahwa jawaban kalian benar walaupun tidak mengukur langsung?',
     ],
     theChallenge: {
-      deskripsi: 'Seorang tukang sedang merancang rangka atap rumah. Ia memasang dua balok kayu yang sejajar sebagai penopang utama, lalu menambahkan satu balok miring untuk memperkuat atap. Sekarang, kalian diminta membantu tukang tersebut merancang bentuk kerangka atap dengan sudut yang kalian tentukan.',
-      poin: [
-        'Gunakan pemahaman kalian tentang dua garis sejajar yang dipotong oleh garis transversal untuk menemukan jawabannya dan jelaskan alasan kalian.',
-      ],
+      deskripsi:
+        'Gambarlah dua garis sejajar yang dipotong oleh satu garis miring (garis transversal) dapat menggunakan gambar pada pertemuan pertama, jika gambar sudah sesuai. Tentukan sendiri besar salah satu sudutnya, kemudian tentukan besar sudut-sudut lainnya. Jelaskan mengapa sudut-sudut tersebut memiliki besar yang sama atau berbeda berdasarkan hubungan sudut pada dua garis sejajar.',
+      poin: [],
     },
     guidingActivities: [
       'Silahkan kerjakan LKPD berikut yang diberikan oleh guru! https://canva.link/qkfj9h32u2vyjt7',

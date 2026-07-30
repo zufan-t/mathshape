@@ -6,7 +6,7 @@ export default function TeacherAuthLayout() {
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-background)' }}>
       <TeacherHeader />
-      <main className="flex-1 pt-20">
+      <main style={{ flex: 1, paddingTop: '110px' }}>
         <Outlet />
       </main>
       <Footer />

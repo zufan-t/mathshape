@@ -20,6 +20,7 @@ export const ROUTES = {
   RESET_PASSWORD: '/reset-password',
   PASSWORD_CHANGED: '/password-berhasil',
   TEACHER_DASHBOARD: '/guru/dasbor',
+  TEACHER_ACCOUNT: '/guru/akun',
   TEACHER_LOGIN: '/guru/masuk',
   TEACHER_REGISTER: '/guru/daftar',
 } as const

@@ -13,6 +13,7 @@ import FAQPage from '@/pages/faq/FAQPage'
 import AccountPage from '@/pages/account/AccountPage'
 import ApresiasiPage from '@/pages/apresiasi/ApresiasiPage'
 import TeacherDashboardPage from '@/pages/teacher/TeacherDashboardPage'
+import TeacherAccountPage from '@/pages/teacher/TeacherAccountPage'
 import LoginPage from '@/pages/auth/LoginPage'
 import RegisterPage from '@/pages/auth/RegisterPage'
 import ForgotPasswordPage from '@/pages/auth/ForgotPasswordPage'
@@ -39,9 +40,10 @@ function App() {
             <Route path={ROUTES.ACCOUNT} element={<AccountPage />} />
           </Route>
 
-          {/* Teacher dashboard — uses TeacherLayout with custom header, no footer */}
+          {/* Teacher dashboard & account — uses TeacherLayout with custom header, no footer */}
           <Route element={<TeacherLayout />}>
             <Route path={ROUTES.TEACHER_DASHBOARD} element={<TeacherDashboardPage />} />
+            <Route path={ROUTES.TEACHER_ACCOUNT} element={<TeacherAccountPage />} />
           </Route>
 
           {/* Teacher auth — uses TeacherAuthLayout */}

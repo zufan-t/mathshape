@@ -106,14 +106,17 @@ export default function TeacherHeader() {
           {/* User Auth Info */}
           {user && isTeacher ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div
-                style={{ display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}
+              <Link
+                to={ROUTES.TEACHER_ACCOUNT}
+                style={{ display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none', transition: 'opacity 200ms' }}
+                className="hover:opacity-80"
+                title="Akun Guru"
               >
                 <div style={{ display: 'flex' }}>
-                  <UserCircle size={28} weight="fill" color="#6C759E" />
+                  <UserCircle size={28} weight="fill" color="#007BFF" />
                 </div>
                 <span style={{
-                  fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 500,
+                  fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 600,
                   color: 'var(--color-text)', maxWidth: '120px', overflow: 'hidden',
                   textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}>
@@ -121,7 +124,7 @@ export default function TeacherHeader() {
                     ? user.user_metadata.full_name.split(' ')[0]
                     : user?.email?.split('@')[0]}
                 </span>
-              </div>
+              </Link>
               <button
                 onClick={() => signOut()}
                 title="Keluar"

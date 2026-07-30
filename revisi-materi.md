@@ -94,9 +94,7 @@ Perhatikan gambar diatas, tahukah kamu saat kita melihat rangka atap rumah, sebe
 
 The Challange 
 
-Seorang tukang sedang merancang rangka atap rumah. Ia memasang dua balok kayu yang sejajar sebagai penopang utama, lalu menambahkan satu balok miring untuk memperkuat atap. Sekarang, kalian diminta membantu tukang tersebut merancang bentuk kerangka atap dengan sudut yang kalian tentukan.  
-
-Gunakan pemahaman kalian tentang dua garis sejajar yang dipotong oleh garis transversal untuk menemukan jawabannya dan jelaskan alasan kalian. 
+Gambarlah dua garis sejajar yang dipotong oleh satu garis miring (garis transversal) dapat menggunakan gambar pada pertemuan pertama, jika gambar sudah sesuai. Tentukan sendiri besar salah satu sudutnya, kemudian tentukan besar sudut-sudut lainnya. Jelaskan mengapa sudut-sudut tersebut memiliki besar yang sama atau berbeda berdasarkan hubungan sudut pada dua garis sejajar. 
 
 Esensial Question 
 
@@ -262,3 +260,8 @@ Untuk menyelesaikan challenge ini, lakukan langkah-langkah berikut.
 2. Tentukan dua segitiga yang sebangun.
 3. Gunakan perbandingan sisi-sisi yang bersesuaian untuk menentukan tinggi pohon.
 4. Tuliskan hasil perhitungan dan kesimpulan secara sistematis.
+
+
+revisi web buat pertemuan kedua, the challange di ubah kata katanya jadi
+
+Gambarlah dua garis sejajar yang dipotong oleh satu garis miring (garis transversal) dapat menggunakan gambar pada pertemuan pertama, jika gambar sudah sesuai.Tentukan sendiri besar salah satu sudutnya, kemudian tentukan besar sudut-sudut lainnya. Jelaskan mengapa sudut-sudut tersebut memiliki besar yang sama atau berbeda berdasarkan hubungan sudut pada dua garis sejajar.

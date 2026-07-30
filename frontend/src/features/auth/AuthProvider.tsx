@@ -14,19 +14,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return
     }
 
+    const syncProfile = async (currentUser: User | null) => {
+      if (!currentUser || !supabase) return
+      const fullName = currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'User'
+      const role = currentUser.user_metadata?.role || 'student'
+      try {
+        await supabase.from('profiles').upsert({
+          id: currentUser.id,
+          full_name: fullName,
+          email: currentUser.email || '',
+          role: role,
+        }, { onConflict: 'id' })
+      } catch (err) {
+        console.warn('Profile sync error:', err)
+      }
+    }
+
     // 1. Ambil sesi saat ini
     supabase.auth.getSession().then(({ data: { session } }: any) => {
       setSession(session)
-      setUser(session?.user ?? null)
+      const currentUser = session?.user ?? null
+      setUser(currentUser)
       setLoading(false)
+      if (currentUser) syncProfile(currentUser)
     })
 
     // 2. Berlangganan perubahan status auth
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event: any, session: any) => {
         setSession(session)
-        setUser(session?.user ?? null)
+        const currentUser = session?.user ?? null
+        setUser(currentUser)
         setLoading(false)
+        if (currentUser) syncProfile(currentUser)
       }
     )
 

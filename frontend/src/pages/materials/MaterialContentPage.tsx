@@ -1052,7 +1052,7 @@ const slideVariants = {
 export default function MaterialContentPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { user, session } = useAuth()
+  const { user, session, loading: authLoading } = useAuth()
   const { markCompleted, saveCurrentSection, saving: savingProgress, saveError } = useMaterialContent(id)
   const { getProgressByMaterialId, loading: progressLoading } = useProgress()
   const { setNavData } = useMaterialNav()
@@ -1065,8 +1065,15 @@ export default function MaterialContentPage() {
   const materi = getMateriById(materialId)
 
   const [revealedUpTo, setRevealedUpTo] = useState(0)
-  const [activeSectionIndex, setActiveSectionIndex] = useState(0)
+  const [activeSectionIndex, setActiveSectionIndex] = useState(() => {
+    const saved = sessionStorage.getItem(`material_${materialId}_activeSection`)
+    return saved ? parseInt(saved, 10) : 0
+  })
   const [direction, setDirection] = useState<'forward' | 'backward'>('forward')
+
+  useEffect(() => {
+    sessionStorage.setItem(`material_${materialId}_activeSection`, activeSectionIndex.toString())
+  }, [materialId, activeSectionIndex])
 
   const changeSectionIndex = (newIdx: number) => {
     if (newIdx > activeSectionIndex) {
@@ -1093,8 +1100,8 @@ export default function MaterialContentPage() {
 
   // Auth guard
   useEffect(() => {
-    if (user === null) navigate(ROUTES.LOGIN, { replace: true })
-  }, [user, navigate])
+    if (!authLoading && user === null) navigate(ROUTES.LOGIN, { replace: true })
+  }, [user, authLoading, navigate])
 
   // Tutup sidebar otomatis di mobile
   useEffect(() => {

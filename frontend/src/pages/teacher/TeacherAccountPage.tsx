@@ -1,36 +1,35 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { UserCircle, Eye, EyeClosed, SignOut, CircleNotch, CheckCircle, Warning, PencilSimple } from '@phosphor-icons/react'
+import { UserCircle, Eye, EyeClosed, SignOut, CircleNotch, CheckCircle, Warning, PencilSimple, ArrowLeft } from '@phosphor-icons/react'
 import Button from '@/components/ui/Button'
 import { ROUTES } from '@/lib/constants'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/AuthContext'
 
-// ─── Main Page ─────────────────────────────────────────────────────────────────
-export default function AccountPage() {
+export default function TeacherAccountPage() {
   const { user, loading: authLoading, signOut } = useAuth()
   const navigate = useNavigate()
 
-  const [fullName, setFullName]       = useState('')
-  const [initName, setInitName]       = useState('')   // nilai awal untuk "Batal"
+  const [fullName, setFullName]         = useState('')
+  const [initName, setInitName]         = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [newPassword, setNewPassword] = useState('')
-  const [isEditing, setIsEditing]     = useState(false)  // mode edit on/off
+  const [newPassword, setNewPassword]   = useState('')
+  const [isEditing, setIsEditing]       = useState(false)
 
-  const [saving, setSaving]           = useState(false)
+  const [saving, setSaving]             = useState(false)
   const [loadingProfile, setLoadingProfile] = useState(true)
-  const [successMsg, setSuccessMsg]   = useState<string | null>(null)
-  const [errorMsg, setErrorMsg]       = useState<string | null>(null)
+  const [successMsg, setSuccessMsg]     = useState<string | null>(null)
+  const [errorMsg, setErrorMsg]         = useState<string | null>(null)
 
-  // ── Auth Guard ───────────────────────────────────────────────────────────────
+  // Auth Guard
   useEffect(() => {
     if (!authLoading && user === null) {
-      navigate(ROUTES.LOGIN, { replace: true })
+      navigate(ROUTES.TEACHER_LOGIN, { replace: true })
     }
   }, [user, authLoading, navigate])
 
-  // ── Ambil profil dari tabel profiles ────────────────────────────────────────
+  // Fetch profile
   useEffect(() => {
     if (!user) return
 
@@ -46,7 +45,6 @@ export default function AccountPage() {
         setFullName(data.full_name)
         setInitName(data.full_name)
       } else if (user?.user_metadata?.full_name) {
-        // Fallback: ambil dari user_metadata jika profiles belum ada
         setFullName(user.user_metadata.full_name)
         setInitName(user.user_metadata.full_name)
       }
@@ -56,18 +54,21 @@ export default function AccountPage() {
     fetchProfile()
   }, [user])
 
-  // ── Simpan perubahan profil ──────────────────────────────────────────────────
   const handleSave = async () => {
     if (!user) return
     setSaving(true)
     setSuccessMsg(null)
     setErrorMsg(null)
 
-    // Update nama di tabel profiles
+    // Update profile
     const { error: profileError } = await supabase
       .from('profiles')
-      .update({ full_name: fullName.trim() })
-      .eq('id', user.id)
+      .upsert({ 
+        id: user.id, 
+        full_name: fullName.trim(),
+        email: user.email || '',
+        role: 'teacher'
+      })
 
     if (profileError) {
       setErrorMsg('Gagal menyimpan nama. Silakan coba lagi.')
@@ -75,7 +76,7 @@ export default function AccountPage() {
       return
     }
 
-    // Update password jika diisi
+    // Update password if provided
     if (newPassword.trim().length > 0) {
       if (newPassword.length < 8) {
         setErrorMsg('Kata sandi baru minimal 8 karakter.')
@@ -96,7 +97,6 @@ export default function AccountPage() {
     setSaving(false)
     setIsEditing(false)
 
-    // Auto-hide success message
     setTimeout(() => setSuccessMsg(null), 3000)
   }
 
@@ -110,14 +110,13 @@ export default function AccountPage() {
 
   const handleLogout = async () => {
     await signOut()
-    navigate(ROUTES.HOME)
+    navigate(ROUTES.TEACHER_LOGIN)
   }
 
-  // ── Loading state ────────────────────────────────────────────────────────────
-  if (user === undefined || loadingProfile) {
+  if (authLoading || loadingProfile) {
     return (
-      <div style={{ height: '100svh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <CircleNotch className="animate-spin" size={40} color="var(--color-primary)" />
+      <div style={{ height: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <CircleNotch className="animate-spin" size={40} color="#007BFF" />
       </div>
     )
   }
@@ -147,39 +146,77 @@ export default function AccountPage() {
     minWidth: '120px',
   }
 
-  // Nama tampil: fullName dari DB, atau email username, atau "–"
   const displayName = fullName || user.user_metadata?.full_name || user.email?.split('@')[0] || '–'
   const displayEmail = user.email || '–'
 
-  // ─────────────────────────────────────────────────────────────────────────────
   return (
-    <main style={{ backgroundColor: 'var(--color-background)', minHeight: '100svh' }}>
-      <div
-        className="section-container"
-        style={{ paddingTop: '100px', paddingBottom: '64px', display: 'flex', flexDirection: 'column', gap: '48px' }}
-      >
+    <main style={{ backgroundColor: 'var(--color-background)', minHeight: 'calc(100svh - 130px)', paddingBottom: '64px' }}>
+      <div className="section-container" style={{ paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+        
+        {/* Navigation back to Teacher Dashboard */}
+        <div style={{ maxWidth: '560px', margin: '0 auto', width: '100%' }}>
+          <Link
+            to={ROUTES.TEACHER_DASHBOARD}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              fontFamily: 'var(--font-body)',
+              fontSize: 15,
+              fontWeight: 600,
+              color: '#007BFF',
+              textDecoration: 'none',
+              transition: 'opacity 200ms',
+            }}
+          >
+            <ArrowLeft size={18} weight="bold" />
+            Kembali ke Dasbor Guru
+          </Link>
+        </div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
           style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center',
-            gap: '32px', maxWidth: '560px', margin: '0 auto', width: '100%',
+            gap: '24px', maxWidth: '560px', margin: '0 auto', width: '100%',
+            backgroundColor: 'var(--color-card-bg)',
+            borderRadius: '24px',
+            border: '1.5px solid var(--color-border)',
+            padding: '36px 28px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.04)'
           }}
         >
-          <h1 style={{
-            fontFamily: 'var(--font-heading)', fontSize: '32px', fontWeight: 700,
-            color: 'var(--color-text)', margin: 0, textAlign: 'center',
-          }}>
-            Data diri
-          </h1>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+            <span style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: '12px',
+              fontWeight: 700,
+              color: '#007BFF',
+              backgroundColor: 'var(--color-primary-light)',
+              padding: '4px 12px',
+              borderRadius: '9999px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em'
+            }}>
+              Akun Guru
+            </span>
+            <h1 style={{
+              fontFamily: 'var(--font-heading)', fontSize: '28px', fontWeight: 700,
+              color: 'var(--color-text)', margin: 0, textAlign: 'center',
+            }}>
+              Data Diri Guru
+            </h1>
+          </div>
 
           {/* Avatar */}
           <div style={{
-            width: '100px', height: '100px', borderRadius: '50%',
-            backgroundColor: '#D3D6E2', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: '90px', height: '90px', borderRadius: '50%',
+            backgroundColor: '#007BFF', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 8px 16px rgba(0, 123, 255, 0.2)'
           }}>
-            <UserCircle size={80} color="#ffffff" weight="fill" />
+            <UserCircle size={72} color="#ffffff" weight="fill" />
           </div>
 
           {/* Success / Error Banner */}
@@ -213,7 +250,7 @@ export default function AccountPage() {
           </AnimatePresence>
 
           {/* Form */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
 
             {/* Nama lengkap */}
             <div className="account-field-row">
@@ -230,8 +267,8 @@ export default function AccountPage() {
               ) : (
                 <div style={{
                   flex: 1, padding: '12px 16px', borderRadius: '12px',
-                  backgroundColor: '#E5E8F0', fontFamily: 'var(--font-body)',
-                  fontSize: '16px', color: 'var(--color-text)',
+                  backgroundColor: 'var(--color-input-bg)', fontFamily: 'var(--font-body)',
+                  fontSize: '16px', color: 'var(--color-text)', border: '1px solid var(--color-border)'
                 }}>
                   {displayName}
                 </div>
@@ -243,14 +280,14 @@ export default function AccountPage() {
               <label style={labelStyle}>Email</label>
               <div style={{
                 flex: 1, padding: '12px 16px', borderRadius: '12px',
-                backgroundColor: '#E5E8F0', fontFamily: 'var(--font-body)',
-                fontSize: '16px', color: 'var(--color-text)', opacity: 0.7,
+                backgroundColor: 'var(--color-input-bg)', fontFamily: 'var(--font-body)',
+                fontSize: '16px', color: 'var(--color-text)', opacity: 0.8, border: '1px solid var(--color-border)'
               }}>
                 {displayEmail}
               </div>
             </div>
 
-            {/* Kata sandi baru (opsional, hanya saat editing) */}
+            {/* Kata sandi baru */}
             {isEditing && (
               <div className="account-field-row">
                 <label style={labelStyle}>Kata sandi baru</label>
@@ -280,7 +317,7 @@ export default function AccountPage() {
           </div>
 
           {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
             {isEditing ? (
               <>
                 <Button variant="primary" size="lg" onClick={handleSave} disabled={saving}>
@@ -301,7 +338,7 @@ export default function AccountPage() {
           </div>
 
           {/* Divider */}
-          <div style={{ width: '100%', height: '1px', backgroundColor: '#E5E7EB' }} />
+          <div style={{ width: '100%', height: '1px', backgroundColor: 'var(--color-border)' }} />
 
           {/* Logout */}
           <button
@@ -310,14 +347,14 @@ export default function AccountPage() {
               display: 'flex', alignItems: 'center', gap: '8px',
               background: 'none', border: 'none', cursor: 'pointer',
               fontFamily: 'var(--font-body)', fontSize: '16px',
-              color: '#EF4444', fontWeight: 500, padding: '8px 0',
+              color: '#EF4444', fontWeight: 600, padding: '4px 0',
               transition: 'opacity 200ms',
             }}
             onMouseEnter={e => { e.currentTarget.style.opacity = '0.75' }}
             onMouseLeave={e => { e.currentTarget.style.opacity = '1' }}
           >
             <SignOut size={22} weight="bold" />
-            Keluar dari akun
+            Keluar dari akun guru
           </button>
         </motion.div>
       </div>

@@ -1,18 +1,25 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, Navigate } from 'react-router-dom'
 import Header from './Header'
 import Footer from './Footer'
+import { useAuth } from '@/features/auth/AuthContext'
+import { ROUTES } from '@/lib/constants'
 
 export default function Layout() {
+  const { user, loading } = useAuth()
+  const userRole = user?.user_metadata?.role || 'student'
+  const isTeacher = userRole === 'teacher'
+
+  if (loading) return null
+
+  // Account Guru cannot access Siswa pages
+  if (user && isTeacher) {
+    return <Navigate to={ROUTES.TEACHER_DASHBOARD} replace />
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      {/*
-        pt-20 (80px) accounts for the fixed pill navbar:
-        - top: 16px (navbar position from viewport top)
-        - height: 60px desktop / 52px mobile
-        = ~76px needed, use 80px for breathing room
-      */}
-      <main className="flex-1 pt-28 md:pt-32">
+      <main style={{ flex: 1, paddingTop: '110px' }}>
         <Outlet />
       </main>
       <Footer />

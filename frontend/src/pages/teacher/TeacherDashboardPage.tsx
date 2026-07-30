@@ -30,29 +30,59 @@ interface AnswerRow {
 }
 
 export default function TeacherDashboardPage() {
-  const { user, session } = useAuth()
+  const { user, session, loading: authLoading } = useAuth()
   const navigate = useNavigate()
   const userRole = user?.user_metadata?.role || 'student'
   const isTeacher = userRole === 'teacher'
 
-  // Sort View Mode: 'nama' or 'pertemuan'
-  const [sortBy, setSortBy] = useState<'nama' | 'pertemuan'>('nama')
+  // Sort View Mode: 'nama' or 'pertemuan' with sessionStorage persistence
+  const [sortBy, setSortBy] = useState<'nama' | 'pertemuan'>(() => {
+    return (sessionStorage.getItem('teacher_sortBy') as 'nama' | 'pertemuan') || 'nama'
+  })
 
   // States
   const [students, setStudents] = useState<StudentProfile[]>([])
   const [loadingStudents, setLoadingStudents] = useState(true)
-  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null)
-  const [selectedMaterialId, setSelectedMaterialId] = useState<number>(1)
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(() => {
+    return sessionStorage.getItem('teacher_selectedStudentId') || null
+  })
+  const [selectedMaterialId, setSelectedMaterialId] = useState<number>(() => {
+    const saved = sessionStorage.getItem('teacher_selectedMaterialId')
+    return saved ? parseInt(saved, 10) : 1
+  })
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [loadingAnswers, setLoadingAnswers] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchQuery, setSearchQuery] = useState(() => {
+    return sessionStorage.getItem('teacher_searchQuery') || ''
+  })
 
-  // Route guard: only allow logged-in teachers
+  // Sync states to sessionStorage for persistence on refresh
   useEffect(() => {
-    if (user === null) {
-      navigate(ROUTES.LOGIN, { replace: true })
+    sessionStorage.setItem('teacher_sortBy', sortBy)
+  }, [sortBy])
+
+  useEffect(() => {
+    if (selectedStudentId) {
+      sessionStorage.setItem('teacher_selectedStudentId', selectedStudentId)
+    } else {
+      sessionStorage.removeItem('teacher_selectedStudentId')
     }
-  }, [user, navigate])
+  }, [selectedStudentId])
+
+  useEffect(() => {
+    sessionStorage.setItem('teacher_selectedMaterialId', selectedMaterialId.toString())
+  }, [selectedMaterialId])
+
+  useEffect(() => {
+    sessionStorage.setItem('teacher_searchQuery', searchQuery)
+  }, [searchQuery])
+
+  // Route guard: only allow logged-in teachers (wait for authLoading)
+  useEffect(() => {
+    if (!authLoading && user === null) {
+      navigate(ROUTES.TEACHER_LOGIN, { replace: true })
+    }
+  }, [user, authLoading, navigate])
 
   // Fetch all students (profiles where role = 'student')
   useEffect(() => {
@@ -149,7 +179,7 @@ export default function TeacherDashboardPage() {
   }
 
   return (
-    <div style={{ minHeight: 'calc(100svh - 144px)', backgroundColor: 'var(--color-background)', padding: '16px 32px 40px' }}>
+    <div style={{ minHeight: 'calc(100svh - 176px)', backgroundColor: 'var(--color-background)', padding: '24px 32px 48px' }}>
       <div style={{ display: 'flex', width: '100%', gap: 32, maxWidth: 1400, margin: '0 auto', alignItems: 'flex-start' }}>
 
         {/* ── SIDEBAR ── */}

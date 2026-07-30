@@ -88,10 +88,12 @@ export default function LoginPage() {
         navigate(ROUTES.TEACHER_DASHBOARD)
       } else {
         if (userRole === 'teacher') {
-          navigate(ROUTES.TEACHER_DASHBOARD)
-        } else {
-          navigate(ROUTES.HOME)
+          await supabase.auth.signOut()
+          setError('Akses ditolak: Akun ini terdaftar sebagai guru. Silakan masuk melalui halaman login guru.')
+          setLoading(false)
+          return
         }
+        navigate(ROUTES.HOME)
       }
     }
   }
