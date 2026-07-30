@@ -1455,9 +1455,11 @@ export default function MaterialContentPage() {
         return (
           <SectionCard key="challenge" sectionRef={ref} icon={<IconBadge bg="#E49FFF" color="#7C299D"><Crosshair size={22} /></IconBadge>} title="The Challenge">
             <p style={{ margin: '0 0 12px', whiteSpace: 'pre-line' }}>{renderTextWithLinks(m.theChallenge.deskripsi)}</p>
-            <ul style={{ margin: '0 0 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {m.theChallenge.poin.map((p, i) => <li key={i}>{renderTextWithLinks(p)}</li>)}
-            </ul>
+            {m.theChallenge.poin.length > 0 && (
+              <ul style={{ margin: '0 0 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {m.theChallenge.poin.map((p, i) => <li key={i}>{renderTextWithLinks(p)}</li>)}
+              </ul>
+            )}
             <div style={{
               marginTop: 16,
               padding: '12px 16px',
