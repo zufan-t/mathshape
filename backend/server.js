@@ -82,13 +82,9 @@ app.get('/health', (req, res) => {
 })
 
 // Endpoint: GET /v1/answers
-// Fetch all answers for a specific material and user (or another student if requester is teacher)
+// Fetch answers for a user (optionally filtered by materialId)
 app.get('/v1/answers', authenticateUser, async (req, res) => {
   const { materialId, userId } = req.query
-
-  if (!materialId) {
-    return res.status(400).json({ message: 'materialId parameter is required' })
-  }
 
   try {
     let targetUserId = req.user.id
@@ -108,17 +104,22 @@ app.get('/v1/answers', authenticateUser, async (req, res) => {
       }
     }
 
-    const { data, error } = await req.supabase
+    let query = req.supabase
       .from('user_answers')
-      .select('section_index, question_index, answer_text')
-      .eq('material_id', parseInt(materialId))
+      .select('material_id, section_index, question_index, answer_text, updated_at')
       .eq('user_id', targetUserId)
+
+    if (materialId) {
+      query = query.eq('material_id', parseInt(materialId))
+    }
+
+    const { data, error } = await query
 
     if (error) {
       return res.status(400).json({ message: error.message })
     }
 
-    return res.json(data)
+    return res.json(data || [])
   } catch (err) {
     console.error('Error fetching answers:', err)
     return res.status(500).json({ message: 'Internal Server Error' })

@@ -7,7 +7,9 @@ import {
   Warning,
   CircleNotch,
   FilePdf,
-  Image,
+  Image as ImageIcon,
+  CheckCircle,
+  Printer,
 } from '@phosphor-icons/react'
 import { useAuth } from '@/features/auth/AuthContext'
 import { supabase } from '@/lib/supabase'
@@ -21,13 +23,132 @@ interface StudentProfile {
   full_name: string
   email: string
   role: string
+  isMock?: boolean
 }
 
 interface AnswerRow {
+  material_id?: number
   section_index: number
   question_index: number
   answer_text: string
 }
+
+// ─── DEMO MOCK ANSWERS FOR RICH DEMONSTRATION ─────────────────────────────────
+const MOCK_ANSWERS: Record<string, Record<string, string>> = {
+  // Mock Student 1 (Ahmad Rizky) - Completed All 3 Pertemuan
+  'mock-1': {
+    // Pertemuan 1
+    'p1_2_0': 'Para tukang kayu merancang kerangka atap menggunakan garis sejajar untuk tumpuan dan garis miring transversal agar beban genteng terbagi merata pada seluruh titik tumpu.',
+    'p1_5_0': JSON.stringify({ fileName: 'Laporan_Eksplorasi_GeoGebra_P1.pdf', fileSize: 1450000, fileType: 'application/pdf', fileUrl: '#' }),
+    'p1_6_0': 'Terbentuk pasangan sudut sehadap, sudut berseberangan, sudut bertolak belakang, sudut sepihak, dan sudut berpelurus.',
+    'p1_6_1': 'Besar sudut akan berubah menyesuaikan kemiringan garis transversal, tetapi pasangan sudut sehadap dan berseberangan nilainya selalu sama besar.',
+    'p1_6_2': 'Bisa dibuktikan menggunakan busur derajat atau fitur Angle di aplikasi GeoGebra.',
+    'p1_6_3': JSON.stringify({ fileName: 'Rancangan_Kerangka_Atap_P1.png', fileSize: 680000, fileType: 'image/png', fileUrl: '#' }),
+    'p1_7_0': JSON.stringify({ fileName: 'Solusi_Challenge_Kerangka_Atap.pdf', fileSize: 2100000, fileType: 'application/pdf', fileUrl: '#' }),
+    'p1_8_0': 'Pasangan sudut yang saling bertolak belakang adalah ∠A dengan ∠C, serta ∠B dengan ∠D.',
+    'p1_8_1': 'Pasangan sudut yang saling berpelurus adalah ∠A dengan ∠B, ∠B dengan ∠C, ∠C dengan ∠D, dan ∠D dengan ∠A.',
+    'p1_8_2': 'Sudut bertolak belakang besarnya sama karena berada di seberang titik potong yang sama, sedangkan sudut berpelurus jika dijumlahkan bernilai 180° karena membentuk garis lurus.',
+    'p1_8_3': JSON.stringify({ fileName: 'Jawaban_Kuis_Pertemuan1_Ahmad.pdf', fileSize: 1150000, fileType: 'application/pdf', fileUrl: '#' }),
+    'p1_9_0': 'Saya memahami bahwa konsep kedudukan garis sejajar dan transversal sangat penting dalam teknik sipil dan arsitektur bangunan.',
+
+    // Pertemuan 2
+    'p2_2_0': JSON.stringify({ fileName: 'Ilustrasi_Atap_Rumah_P2.png', fileSize: 920000, fileType: 'image/png', fileUrl: '#' }),
+    'p2_2_1': 'Dengan menggunakan sifat sudut sehadap, berseberangan, atau berpelurus jika salah satu besar sudut sudah diketahui.',
+    'p2_2_2': 'Hubungan sudut sehadap (sama besar), berseberangan (sama besar), dan berpelurus (jumlahnya 180°).',
+    'p2_2_3': 'Ya, dimulai dari sudut yang sehadap atau bertolak belakang dengan sudut yang diketahui.',
+    'p2_2_4': 'Yakin karena sifat-sifat hubungan sudut pada garis sejajar berlaku secara mutlak secara geometris.',
+    'p2_5_0': JSON.stringify({ fileName: 'LKPD_Pertemuan2_Kelompok1.pdf', fileSize: 1800000, fileType: 'application/pdf', fileUrl: '#' }),
+    'p2_6_0': 'Posisi sehadap memiliki besar sudut yang sama.',
+    'p2_6_1': 'Sudut yang bertolak belakang nilainya sama besar.',
+    'p2_6_2': 'Sudut pada garis lurus jika dijumlahkan harus bernilai 180°.',
+    'p2_6_3': 'Bisa, kita menentukan sudut sehadap dulu, lalu sudut bertolak belakang, kemudian sudut berpelurus.',
+    'p2_6_4': 'Yakin karena hasil perhitungan konsisten dengan hukum geometri garis sejajar.',
+    'p2_7_0': JSON.stringify({ fileName: 'Hasil_Challenge_Pertemuan2.pdf', fileSize: 2300000, fileType: 'application/pdf', fileUrl: '#' }),
+    'p2_8_0': 'Jika ∠a = 65°, maka:\n• ∠c = 65° (bertolak belakang dengan a)\n• ∠e = 65° (sehadap dengan a)\n• ∠g = 65° (luar berseberangan dengan a)\n• ∠b = 180° - 65° = 115° (berpelurus dengan a)\n• ∠d = 115° (bertolak belakang dengan b)\n• ∠f = 115° (sehadap dengan b)\n• ∠h = 115° (luar berseberangan dengan b)',
+    'p2_8_1': 'Gunakan hubungan sudut sehadap untuk mencari ∠e, bertolak belakang untuk ∠c, dan berpelurus (180° - 65°) untuk mencari ∠b.',
+    'p2_8_2': 'Langkah 1: Cari ∠b = 180° - 65° = 115°. Langkah 2: Tentukan ∠c, ∠d, ∠e, ∠f, ∠g, ∠h berdasarkan sifat keterhubungan sudut.',
+    'p2_8_3': 'Dua rel konveyor harus dipasang sejajar agar sudut transversal penyangga konsisten sehingga sabuk konveyor tidak miring atau macet.',
+    'p2_8_4': JSON.stringify({ fileName: 'Lembar_Kuis_Pertemuan2.pdf', fileSize: 1400000, fileType: 'application/pdf', fileUrl: '#' }),
+    'p2_9_0': 'Pembelajaran hari ini membuktikan betapa matematisnya perancangan sistem konveyor industri.',
+
+    // Pertemuan 3
+    'p3_2_0': 'Karena beberapa benda seperti pohon atau tiang gedung terlalu tinggi dan berbahaya jika dipanjat.',
+    'p3_2_1': 'Bayangan yang dibentuk sinar matahari memiliki sudut elevasi yang sama pada waktu yang sama sehingga membentuk segitiga sebangun.',
+    'p3_2_2': 'Karena kedua segitiga memiliki pasangan sudut yang sama besar (sudut siku-siku dan sudut elevasi matahari).',
+    'p3_2_3': 'Dengan menggunakan perbandingan sisi: (Tinggi Pohon / Tinggi Tongkat) = (Panjang Bayangan Pohon / Panjang Bayangan Tongkat).',
+    'p3_2_4': 'Karena posisi dan sudut datang sinar matahari berubah seiring berjalannya waktu.',
+    'p3_5_0': JSON.stringify({ fileName: 'LKPD_Pertemuan3_Kesebangunan.pdf', fileSize: 1650000, fileType: 'application/pdf', fileUrl: '#' }),
+    'p3_6_0': 'Segitiga siku-siku.',
+    'p3_6_1': 'Karena memiliki dua sudut yang sama besar (sudut siku-siku 90° dan sudut elevasi sinar matahari).',
+    'p3_6_2': 'Sisi tegak (tinggi objek), sisi alas (panjang bayangan), dan sisi miring (garis sinar matahari).',
+    'p3_6_3': 'Dengan rumus perbandingan senilai: a/b = c/d.',
+    'p3_6_4': 'Kalikan panjang bayangan pohon dengan (tinggi tongkat / panjang bayangan tongkat).',
+    'p3_6_5': 'Agar sudut elevasi matahari tetap sama persis untuk kedua objek.',
+    'p3_7_0': JSON.stringify({ fileName: 'Solusi_Tinggi_Pohon_Pertemuan3.pdf', fileSize: 2500000, fileType: 'application/pdf', fileUrl: '#' }),
+    'p3_8_0': 'Cara 1 (Perbandingan Segitiga Sebangun):\nTinggi / 4 = (12 + 3) / 3 => Tinggi / 4 = 15 / 3 = 5 => Tinggi = 20 meter.\n\nCara 2 (Garis Miring Pandangan):\nTinggi / 4 = 25 / 5 => Tinggi / 4 = 5 => Tinggi = 20 meter.',
+    'p3_8_1': 'Posisi 1: Menggunakan bayangan cermin di lantai.\nPosisi 2: Menggunakan bayangan tiang bendera di halaman.',
+    'p3_8_2': 'Menggunakan pemantulan cahaya pada permukaan air di dalam wadah kecil di tanah.',
+    'p3_8_3': JSON.stringify({ fileName: 'Lembar_Kuis_Pertemuan3.pdf', fileSize: 1300000, fileType: 'application/pdf', fileUrl: '#' }),
+    'p3_9_0': 'Konsep kesebangunan sangat bermanfaat untuk pengukuran tidak langsung secara praktis dan presisi.',
+  },
+
+  // Mock Student 2 (Budi Santoso) - Completed Pertemuan 1 & 2
+  'mock-2': {
+    'p1_2_0': 'Garis sejajar dipakai untuk penopang bawah atap, dan garis transversal dipasang miring untuk mendistribusikan berat beban genteng.',
+    'p1_5_0': JSON.stringify({ fileName: 'Laporan_Geogebra_Budi.pdf', fileSize: 1200000, fileType: 'application/pdf', fileUrl: '#' }),
+    'p1_6_0': 'Hubungan sudut sehadap, sudut berseberangan, dan sudut bertolak belakang.',
+    'p1_6_1': 'Besar sudutnya berubah mengikuti kemiringan garis, tetapi perbandingannya tetap konsisten.',
+    'p1_6_2': 'Mengukur langsung sudut-sudutnya memakai fitur pengukur sudut GeoGebra.',
+    'p1_6_3': JSON.stringify({ fileName: 'Sketsa_Atap_Budi.png', fileSize: 540000, fileType: 'image/png', fileUrl: '#' }),
+    'p1_7_0': JSON.stringify({ fileName: 'Hasil_Challenge_Budi.pdf', fileSize: 1900000, fileType: 'application/pdf', fileUrl: '#' }),
+    'p1_8_0': '∠A bertolak belakang dengan ∠C, ∠B bertolak belakang dengan ∠D.',
+    'p1_8_1': '∠A dan ∠B berpelurus, ∠C dan ∠D berpelurus.',
+    'p1_8_2': 'Karena membentuk satu garis lurus 180 derajat.',
+    'p1_8_3': JSON.stringify({ fileName: 'Kuis_P1_Budi.pdf', fileSize: 980000, fileType: 'application/pdf', fileUrl: '#' }),
+    'p1_9_0': 'Sangat menarik belajar garis dan sudut langsung dengan contoh rangka atap.',
+
+    'p2_2_0': JSON.stringify({ fileName: 'Ilustrasi_Sudut_Budi.png', fileSize: 810000, fileType: 'image/png', fileUrl: '#' }),
+    'p2_2_1': 'Dengan menggunakan sudut sehadap yang nilainya sama.',
+    'p2_2_2': 'Sudut sehadap, berseberangan, dan berpelurus.',
+    'p2_2_3': 'Ya, bisa dihitung satu per satu.',
+    'p2_2_4': 'Yakin karena rumus sudut sehadap dan berpelurus pasti benar.',
+    'p2_5_0': JSON.stringify({ fileName: 'LKPD_Pertemuan2_Budi.pdf', fileSize: 1400000, fileType: 'application/pdf', fileUrl: '#' }),
+    'p2_6_0': 'Besar sudutnya sama karena sehadap.',
+    'p2_6_1': 'Nilainya sama karena bertolak belakang.',
+    'p2_6_2': 'Jumlahnya 180 derajat.',
+    'p2_6_3': 'Bisa, dimulai dari sudut yang diketahui.',
+    'p2_6_4': 'Yakin karena perhitungan sesuai dengan teori.',
+    'p2_7_0': JSON.stringify({ fileName: 'Challenge_P2_Budi.pdf', fileSize: 2100000, fileType: 'application/pdf', fileUrl: '#' }),
+    'p2_8_0': '∠a=65°, ∠b=115°, ∠c=65°, ∠d=115°, ∠e=65°, ∠f=115°, ∠g=65°, ∠h=115°.',
+    'p2_8_1': 'Sudut sehadap, bertolak belakang, dan berpelurus.',
+    'p2_8_2': 'Menghitung 180 - 65 = 115 untuk sudut berpelurus.',
+    'p2_8_3': 'Agar posisi conveyor simetris dan beban terbagi rata.',
+    'p2_8_4': JSON.stringify({ fileName: 'Kuis_P2_Budi.pdf', fileSize: 1100000, fileType: 'application/pdf', fileUrl: '#' }),
+    'p2_9_0': 'Bagus dan bermanfaat.',
+  },
+
+  // Mock Student 3 (Siti Rahmawati) - Completed Pertemuan 1
+  'mock-3': {
+    'p1_2_0': 'Tukang kayu memastikan sudut presisi dengan siku-siku dan prinsip dua garis sejajar yang dipotong garis diagonal.',
+    'p1_5_0': JSON.stringify({ fileName: 'Laporan_Geogebra_Siti.pdf', fileSize: 1350000, fileType: 'application/pdf', fileUrl: '#' }),
+    'p1_6_0': 'Terbentuk sudut sehadap dan sudut berseberangan.',
+    'p1_6_1': 'Besar sudut menyesuaikan dengan kemiringan garis diagonal.',
+    'p1_6_2': 'Dengan mengukur busur pada titik potong.',
+    'p1_6_3': JSON.stringify({ fileName: 'Rancangan_Atap_Siti.png', fileSize: 720000, fileType: 'image/png', fileUrl: '#' }),
+    'p1_7_0': JSON.stringify({ fileName: 'Challenge_Atap_Siti.pdf', fileSize: 1850000, fileType: 'application/pdf', fileUrl: '#' }),
+    'p1_8_0': '∠A dengan ∠C, ∠B dengan ∠D.',
+    'p1_8_1': '∠A dan ∠B berpelurus (180°).',
+    'p1_8_2': 'Karena berada pada satu garis lurus.',
+    'p1_8_3': JSON.stringify({ fileName: 'Lembar_Kuis_Siti.pdf', fileSize: 1050000, fileType: 'application/pdf', fileUrl: '#' }),
+    'p1_9_0': 'Materi kedudukan garis sangat bermanfaat.',
+  },
+}
+
+const DEFAULT_MOCK_STUDENTS: StudentProfile[] = [
+  { id: 'mock-1', full_name: 'Ahmad Rizky', email: 'ahmad.rizky@student.smp8.sch.id', role: 'student', isMock: true },
+  { id: 'mock-2', full_name: 'Budi Santoso', email: 'budi.santoso@student.smp8.sch.id', role: 'student', isMock: true },
+  { id: 'mock-3', full_name: 'Siti Rahmawati', email: 'siti.rahma@student.smp8.sch.id', role: 'student', isMock: true },
+]
 
 export default function TeacherDashboardPage() {
   const { user, session, loading: authLoading } = useAuth()
@@ -86,7 +207,7 @@ export default function TeacherDashboardPage() {
 
   // Fetch all students (profiles where role = 'student')
   useEffect(() => {
-    if (!isTeacher || !session) return
+    if (!isTeacher) return
 
     async function fetchStudents() {
       setLoadingStudents(true)
@@ -97,46 +218,101 @@ export default function TeacherDashboardPage() {
           .eq('role', 'student')
           .order('full_name', { ascending: true })
 
-        if (error) throw error
-        setStudents(data || [])
+        if (error) {
+          console.warn('Error fetching real students from Supabase:', error.message)
+        }
+
+        const realStudents = (data || []).map((s: { id: string; full_name: string; email: string; role: string }) => ({ ...s, isMock: false }))
+
+        // Combine real students with mock demo students (filtering out duplicates by ID)
+        const combined = [...realStudents]
+        DEFAULT_MOCK_STUDENTS.forEach((mock) => {
+          if (!combined.some((s) => s.id === mock.id)) {
+            combined.push(mock)
+          }
+        })
+
+        setStudents(combined)
       } catch (err) {
         console.error('Error fetching students:', err)
+        setStudents(DEFAULT_MOCK_STUDENTS)
       } finally {
         setLoadingStudents(false)
       }
     }
 
     fetchStudents()
-  }, [isTeacher, session])
+  }, [isTeacher])
 
   // Fetch answers for selected student + material
   useEffect(() => {
-    if (!selectedStudentId || !selectedMaterialId || !session) return
+    if (!selectedStudentId || !selectedMaterialId) return
 
+    const selectedStudent = students.find((s) => s.id === selectedStudentId)
+
+    // Handle Mock Student answers
+    if (selectedStudent?.isMock || selectedStudentId.startsWith('mock-')) {
+      const mockSet = MOCK_ANSWERS[selectedStudentId] || {}
+      const answersMap: Record<string, string> = {}
+      const prefix = `p${selectedMaterialId}_`
+
+      Object.entries(mockSet).forEach(([key, val]) => {
+        if (key.startsWith(prefix)) {
+          const rawKey = key.substring(prefix.length) // e.g. '2_0'
+          answersMap[rawKey] = val
+        }
+      })
+
+      setAnswers(answersMap)
+      setLoadingAnswers(false)
+      return
+    }
+
+    // Handle Real Student answers (Fetch from Supabase or Backend API)
     async function fetchStudentAnswers() {
       setLoadingAnswers(true)
       try {
-        const response = await fetch(
-          `${API_URL}/answers?materialId=${selectedMaterialId}&userId=${selectedStudentId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${session?.access_token || ''}`,
-            },
-          }
-        )
+        // Try Supabase directly first
+        const { data: dbData, error: dbError } = await supabase
+          .from('user_answers')
+          .select('section_index, question_index, answer_text')
+          .eq('material_id', selectedMaterialId)
+          .eq('user_id', selectedStudentId)
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch answers')
+        if (!dbError && dbData && dbData.length > 0) {
+          const answersMap: Record<string, string> = {}
+          dbData.forEach((ans: AnswerRow) => {
+            answersMap[`${ans.section_index}_${ans.question_index}`] = ans.answer_text
+          })
+          setAnswers(answersMap)
+          setLoadingAnswers(false)
+          return
         }
 
-        const data: AnswerRow[] = await response.json()
+        // Fallback to Express backend API if token is available
+        if (session?.access_token) {
+          const response = await fetch(
+            `${API_URL}/answers?materialId=${selectedMaterialId}&userId=${selectedStudentId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${session.access_token}`,
+              },
+            }
+          )
 
-        // Convert to key-value record
-        const answersMap: Record<string, string> = {}
-        data.forEach((ans) => {
-          answersMap[`${ans.section_index}_${ans.question_index}`] = ans.answer_text
-        })
-        setAnswers(answersMap)
+          if (response.ok) {
+            const apiData: AnswerRow[] = await response.json()
+            const answersMap: Record<string, string> = {}
+            apiData.forEach((ans) => {
+              answersMap[`${ans.section_index}_${ans.question_index}`] = ans.answer_text
+            })
+            setAnswers(answersMap)
+            setLoadingAnswers(false)
+            return
+          }
+        }
+
+        setAnswers({})
       } catch (err) {
         console.error('Error fetching student answers:', err)
         setAnswers({})
@@ -146,7 +322,7 @@ export default function TeacherDashboardPage() {
     }
 
     fetchStudentAnswers()
-  }, [selectedStudentId, selectedMaterialId, session])
+  }, [selectedStudentId, selectedMaterialId, session, students])
 
   // Filter students based on search input
   const filteredStudents = students.filter(
@@ -158,30 +334,88 @@ export default function TeacherDashboardPage() {
   const selectedStudent = students.find((s) => s.id === selectedStudentId)
   const currentMaterial = MATERI_DATA.find((m) => m.id === selectedMaterialId)
 
+  // Count answered items
+  const filledAnswersCount = Object.values(answers).filter((val) => val && val.trim().length > 0).length
+
+  // Action: Print student answer report
+  const handlePrintReport = () => {
+    window.print()
+  }
+
   // Access Denied View if not teacher
   if (!isTeacher) {
     return (
-      <div style={{ minHeight: 'calc(100svh - 80px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, backgroundColor: 'var(--color-background)' }}>
+      <div
+        style={{
+          minHeight: 'calc(100svh - 80px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 24,
+          backgroundColor: 'var(--color-background)',
+        }}
+      >
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          style={{ maxWidth: 460, textAlign: 'center', backgroundColor: 'var(--color-card-bg)', border: '1.5px solid var(--color-border)', padding: '40px 32px', borderRadius: 24 }}
+          style={{
+            maxWidth: 460,
+            textAlign: 'center',
+            backgroundColor: 'var(--color-card-bg)',
+            border: '1.5px solid var(--color-border)',
+            padding: '40px 32px',
+            borderRadius: 24,
+          }}
         >
           <Warning size={64} color="#EF4444" weight="fill" style={{ margin: '0 auto 20px' }} />
-          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 24, fontWeight: 700, color: 'var(--color-text)', margin: '0 0 12px' }}>Akses Ditolak</h1>
-          <p style={{ fontFamily: 'var(--font-body)', fontSize: 15, color: 'var(--color-text-light)', lineHeight: 1.6, margin: '0 0 24px' }}>
+          <h1
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: 24,
+              fontWeight: 700,
+              color: 'var(--color-text)',
+              margin: '0 0 12px',
+            }}
+          >
+            Akses Ditolak
+          </h1>
+          <p
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: 15,
+              color: 'var(--color-text-light)',
+              lineHeight: 1.6,
+              margin: '0 0 24px',
+            }}
+          >
             Maaf, halaman ini dikhususkan untuk akun guru. Silakan login menggunakan akun guru untuk mengakses dasbor.
           </p>
-          <Button variant="primary" onClick={() => navigate(ROUTES.HOME)}>Kembali ke Beranda</Button>
+          <Button variant="primary" onClick={() => navigate(ROUTES.HOME)}>
+            Kembali ke Beranda
+          </Button>
         </motion.div>
       </div>
     )
   }
 
   return (
-    <div style={{ minHeight: 'calc(100svh - 176px)', backgroundColor: 'var(--color-background)', padding: '24px 32px 48px' }}>
-      <div style={{ display: 'flex', width: '100%', gap: 32, maxWidth: 1400, margin: '0 auto', alignItems: 'flex-start' }}>
-
+    <div
+      style={{
+        minHeight: 'calc(100svh - 176px)',
+        backgroundColor: 'var(--color-background)',
+        padding: '24px 32px 48px',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          width: '100%',
+          gap: 32,
+          maxWidth: 1400,
+          margin: '0 auto',
+          alignItems: 'flex-start',
+        }}
+      >
         {/* ── SIDEBAR ── */}
         <aside
           style={{
@@ -196,7 +430,7 @@ export default function TeacherDashboardPage() {
             gap: 16,
             boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
           }}
-          className="teacher-sidebar"
+          className="teacher-sidebar no-print"
         >
           {/* Header text */}
           <h3
@@ -305,16 +539,30 @@ export default function TeacherDashboardPage() {
                         background: 'none',
                         border: 'none',
                         textAlign: 'left',
-                        padding: '6px 4px',
+                        padding: '8px 6px',
                         cursor: 'pointer',
                         fontFamily: 'var(--font-body)',
                         fontSize: 16,
                         fontWeight: isSelected ? 700 : 500,
                         color: isSelected ? '#007BFF' : 'var(--color-text)',
                         transition: 'color 150ms',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        borderRadius: 8,
                       }}
                     >
-                      {s.full_name}
+                      <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {s.full_name}
+                      </span>
+                      {s.isMock && (
+                        <span
+                          title="Siswa telah menyelesaikan tugas"
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 600, color: '#10B981', backgroundColor: 'rgba(16, 185, 129, 0.1)', padding: '2px 8px', borderRadius: 9999 }}
+                        >
+                          <CheckCircle size={12} weight="fill" /> Selesai
+                        </span>
+                      )}
                     </button>
                   )
                 })
@@ -372,9 +620,15 @@ export default function TeacherDashboardPage() {
                                   fontWeight: isSelected ? 700 : 500,
                                   color: isSelected ? '#007BFF' : 'var(--color-text)',
                                   transition: 'color 150ms',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
                                 }}
                               >
-                                {s.full_name}
+                                <span>{s.full_name}</span>
+                                {s.isMock && (
+                                  <CheckCircle size={14} color="#10B981" weight="fill" />
+                                )}
                               </button>
                             )
                           })}
@@ -390,7 +644,7 @@ export default function TeacherDashboardPage() {
         </aside>
 
         {/* ── MAIN CONTENT AREA ── */}
-        <main style={{ flex: 1, minWidth: 0 }}>
+        <main style={{ flex: 1, minWidth: 0 }} className="print-area">
           {!selectedStudentId || !selectedStudent ? (
             /* UNSELECTED STATE: "Pilih nama" */
             <div
@@ -417,30 +671,76 @@ export default function TeacherDashboardPage() {
           ) : (
             /* SELECTED STUDENT STATE */
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-
               {/* Student Header */}
-              <div>
-                <h1
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: 28,
-                    fontWeight: 700,
-                    color: 'var(--color-text)',
-                    margin: 0,
-                  }}
-                >
-                  {selectedStudent.full_name}
-                </h1>
-                <p
-                  style={{
-                    fontFamily: 'var(--font-body)',
-                    fontSize: 15,
-                    color: 'var(--color-text-light)',
-                    margin: '4px 0 0 0',
-                  }}
-                >
-                  {selectedStudent.email}
-                </p>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+                <div>
+                  <h1
+                    style={{
+                      fontFamily: 'var(--font-heading)',
+                      fontSize: 28,
+                      fontWeight: 700,
+                      color: 'var(--color-text)',
+                      margin: 0,
+                    }}
+                  >
+                    {selectedStudent.full_name}
+                  </h1>
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 15,
+                      color: 'var(--color-text-light)',
+                      margin: '4px 0 0 0',
+                    }}
+                  >
+                    {selectedStudent.email}
+                  </p>
+                </div>
+
+                {/* Header Action: Print / PDF Report */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }} className="no-print">
+                  {filledAnswersCount > 0 && (
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        padding: '6px 14px',
+                        borderRadius: 9999,
+                        backgroundColor: '#ECFDF5',
+                        color: '#059669',
+                        fontSize: 13,
+                        fontWeight: 700,
+                        border: '1px solid #A7F3D0',
+                      }}
+                    >
+                      <CheckCircle size={16} weight="fill" /> {filledAnswersCount} Jawaban Terisi
+                    </span>
+                  )}
+                  <button
+                    onClick={handlePrintReport}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      padding: '10px 18px',
+                      borderRadius: 12,
+                      backgroundColor: 'var(--color-card-bg)',
+                      border: '1.5px solid var(--color-border)',
+                      color: 'var(--color-text)',
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 14,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                      transition: 'all 150ms',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#007BFF')}
+                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--color-border)')}
+                  >
+                    <Printer size={18} color="#007BFF" weight="bold" /> Cetak Hasil Jawaban
+                  </button>
+                </div>
               </div>
 
               {/* Section Header depending on sortBy view */}
@@ -459,7 +759,7 @@ export default function TeacherDashboardPage() {
                     Pertemuan
                   </h3>
 
-                  <div style={{ display: 'flex', gap: 16, width: '100%', maxWidth: 700, justifyContent: 'center' }}>
+                  <div style={{ display: 'flex', gap: 16, width: '100%', maxWidth: 700, justifyContent: 'center' }} className="no-print">
                     {[1, 2, 3].map((pNum) => {
                       const isSelected = selectedMaterialId === pNum
                       return (
@@ -525,7 +825,7 @@ export default function TeacherDashboardPage() {
                     { title: 'Guiding Activities', key: 'guidingActivities', secIdx: 5, type: 'file', items: ['Upload Laporan Aktivitas (PDF)'] },
                     { title: 'Guiding Questions', key: 'guidingQuestions', secIdx: 6, type: 'text', items: currentMaterial.guidingQuestions },
                     { title: 'Solutions & Publishing', key: 'solutions', secIdx: 7, type: 'file', items: ['Upload Hasil Challenge (PDF)'] },
-                    { title: 'Kuis', key: 'kuis', secIdx: 8, type: 'text', items: [...currentMaterial.kuis.pertanyaan, 'Upload Kuis (PDF/Foto)'] },
+                    { title: 'Kuis', key: 'kuis', secIdx: 8, type: 'text', items: [...currentMaterial.kuis.pertanyaan, 'Upload Lembar Jawaban Kuis (PDF/Foto)'] },
                     { title: 'Refleksi', key: 'refleksi', secIdx: 9, type: 'text', items: [currentMaterial.refleksi] },
                   ].map((sec) => (
                     <div
@@ -552,7 +852,7 @@ export default function TeacherDashboardPage() {
                           gap: 10,
                         }}
                       >
-                        <Notebook size={22} color="#007BFF" />
+                        <Notebook size={22} color="#007BFF" weight="bold" />
                         {sec.title}
                       </h4>
 
@@ -568,13 +868,18 @@ export default function TeacherDashboardPage() {
                             (sec.secIdx === 8 && qIdx === currentMaterial.kuis.pertanyaan.length)
 
                           let fileObj: { fileName: string; fileSize: number; fileType: string; fileData?: string; fileUrl?: string } | null = null
-                          if (isFile && answerText) {
+                          if (answerText) {
                             try {
-                              fileObj = JSON.parse(answerText)
+                              const parsed = JSON.parse(answerText)
+                              if (parsed && typeof parsed === 'object' && (parsed.fileName || parsed.fileUrl || parsed.fileData)) {
+                                fileObj = parsed
+                              }
                             } catch (e) {
-                              // Fallback to raw text
+                              // Plain text answer
                             }
                           }
+
+                          const isImage = fileObj?.fileType?.includes('image') || fileObj?.fileName?.match(/\.(png|jpg|jpeg|gif|webp)$/i)
 
                           const formatSize = (bytes: number) => {
                             if (!bytes || bytes === 0) return '0 B'
@@ -630,17 +935,31 @@ export default function TeacherDashboardPage() {
                                   marginTop: 4,
                                 }}
                               >
-                                {isFile ? (
-                                  fileObj ? (
+                                {fileObj ? (
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
                                       <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
-                                        {fileObj.fileType.includes('pdf') ? (
-                                          <div style={{ color: '#EF4444', display: 'flex' }}><FilePdf size={28} weight="fill" /></div>
+                                        {isImage ? (
+                                          <div style={{ color: '#10B981', display: 'flex' }}>
+                                            <ImageIcon size={28} weight="fill" />
+                                          </div>
                                         ) : (
-                                          <div style={{ color: '#10B981', display: 'flex' }}><Image size={28} weight="fill" /></div>
+                                          <div style={{ color: '#EF4444', display: 'flex' }}>
+                                            <FilePdf size={28} weight="fill" />
+                                          </div>
                                         )}
                                         <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                                          <span style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600, color: 'var(--color-text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                          <span
+                                            style={{
+                                              fontFamily: 'var(--font-body)',
+                                              fontSize: 14,
+                                              fontWeight: 600,
+                                              color: 'var(--color-text)',
+                                              whiteSpace: 'nowrap',
+                                              overflow: 'hidden',
+                                              textOverflow: 'ellipsis',
+                                            }}
+                                          >
                                             {fileObj.fileName}
                                           </span>
                                           <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--color-text-light)' }}>
@@ -649,7 +968,7 @@ export default function TeacherDashboardPage() {
                                         </div>
                                       </div>
                                       <a
-                                        href={fileObj.fileUrl || fileObj.fileData}
+                                        href={fileObj.fileUrl || fileObj.fileData || '#'}
                                         download={fileObj.fileName}
                                         target="_blank"
                                         rel="noopener noreferrer"
@@ -669,11 +988,22 @@ export default function TeacherDashboardPage() {
                                         Unduh / Buka
                                       </a>
                                     </div>
-                                  ) : (
-                                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontStyle: 'italic', color: '#9CA3AF', margin: 0 }}>
-                                      Belum ada file diunggah oleh siswa
-                                    </p>
-                                  )
+
+                                    {/* Image Preview if available */}
+                                    {isImage && (fileObj.fileData || (fileObj.fileUrl && fileObj.fileUrl !== '#')) && (
+                                      <div style={{ marginTop: 8, borderRadius: 10, overflow: 'hidden', border: '1px solid var(--color-border)', maxWidth: 420 }}>
+                                        <img
+                                          src={fileObj.fileData || fileObj.fileUrl}
+                                          alt={fileObj.fileName}
+                                          style={{ width: '100%', maxHeight: 260, objectFit: 'cover', display: 'block' }}
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                ) : isFile && !answerText ? (
+                                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, fontStyle: 'italic', color: '#9CA3AF', margin: 0 }}>
+                                    Belum ada file diunggah oleh siswa
+                                  </p>
                                 ) : answerText ? (
                                   <p style={{ fontFamily: 'var(--font-body)', fontSize: 15, color: 'var(--color-text)', margin: 0, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
                                     {answerText}
@@ -700,6 +1030,11 @@ export default function TeacherDashboardPage() {
       <style>{`
         @media (max-width: 768px) {
           .teacher-sidebar { display: none !important; }
+        }
+        @media print {
+          .no-print { display: none !important; }
+          .print-area { width: 100% !important; margin: 0 !important; padding: 0 !important; }
+          body { background: white !important; color: black !important; }
         }
       `}</style>
     </div>
