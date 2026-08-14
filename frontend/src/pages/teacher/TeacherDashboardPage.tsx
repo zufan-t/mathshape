@@ -10,6 +10,7 @@ import {
   Image as ImageIcon,
   CheckCircle,
   Printer,
+  FileDoc,
 } from '@phosphor-icons/react'
 import { useAuth } from '@/features/auth/AuthContext'
 import { supabase } from '@/lib/supabase'
@@ -342,6 +343,137 @@ export default function TeacherDashboardPage() {
     window.print()
   }
 
+  // Action: Export student answer report to Word (.doc / .docx format)
+  const handleExportWord = () => {
+    if (!selectedStudent || !currentMaterial) return
+
+    const studentName = selectedStudent.full_name
+    const studentEmail = selectedStudent.email
+    const materialTitle = `Pertemuan ${selectedMaterialId} - ${currentMaterial.judul}`
+    const dateStr = new Date().toLocaleDateString('id-ID', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
+
+    const sections = [
+      { title: 'Essential Questions', secIdx: 2, type: 'text', items: currentMaterial.essentialQuestions },
+      { title: 'Guiding Activities', secIdx: 5, type: 'file', items: ['Upload Laporan Aktivitas (PDF)'] },
+      { title: 'Guiding Questions', secIdx: 6, type: 'text', items: currentMaterial.guidingQuestions },
+      { title: 'Solutions & Publishing', secIdx: 7, type: 'file', items: ['Upload Hasil Challenge (PDF)'] },
+      { title: 'Kuis', secIdx: 8, type: 'text', items: [...currentMaterial.kuis.pertanyaan, 'Upload Lembar Jawaban Kuis (PDF/Foto)'] },
+      { title: 'Refleksi', secIdx: 9, type: 'text', items: [currentMaterial.refleksi] },
+    ]
+
+    let bodyHtml = ''
+
+    sections.forEach((sec) => {
+      bodyHtml += `<h3 style="color:#007BFF; font-size:13pt; margin-top:20px; margin-bottom:8px; border-bottom:1px solid #007BFF; padding-bottom:4px;">📌 ${sec.title}</h3>`
+      bodyHtml += `<div style="margin-bottom:16px;">`
+
+      sec.items.forEach((prompt, qIdx) => {
+        const answerKey = `${sec.secIdx}_${qIdx}`
+        const answerText = answers[answerKey]
+
+        const isFile =
+          sec.type === 'file' ||
+          (sec.secIdx === 6 && selectedMaterialId === 1 && qIdx === 3) ||
+          (sec.secIdx === 2 && selectedMaterialId === 2 && qIdx === 0) ||
+          (sec.secIdx === 8 && qIdx === currentMaterial.kuis.pertanyaan.length)
+
+        let fileObj: { fileName: string; fileSize: number; fileType: string } | null = null
+        if (answerText) {
+          try {
+            const parsed = JSON.parse(answerText)
+            if (parsed && typeof parsed === 'object' && (parsed.fileName || parsed.fileUrl || parsed.fileData)) {
+              fileObj = parsed
+            }
+          } catch (e) {
+            // plain text
+          }
+        }
+
+        bodyHtml += `<div style="font-weight:bold; color:#111827; margin-top:10px; margin-bottom:4px;">${qIdx + 1}. ${prompt}</div>`
+
+        if (fileObj) {
+          bodyHtml += `<div style="background-color:#EBF5FF; border:1px dashed #007BFF; padding:8px 12px; border-radius:6px; color:#0056b3; font-weight:bold; font-size:10pt; margin-bottom:10px;">📎 Berkas Diunggah: ${fileObj.fileName} (${(fileObj.fileSize / 1024).toFixed(1)} KB)</div>`
+        } else if (isFile && !answerText) {
+          bodyHtml += `<div style="font-style:italic; color:#9CA3AF; font-size:10pt; margin-bottom:10px;">(Belum ada file diunggah oleh siswa)</div>`
+        } else if (answerText) {
+          const safeText = answerText.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br/>')
+          bodyHtml += `<div style="background-color:#F9FAFB; border:1px solid #E5E7EB; padding:10px 14px; border-radius:6px; color:#1F2937; font-size:11pt; margin-bottom:10px;">${safeText}</div>`
+        } else {
+          bodyHtml += `<div style="font-style:italic; color:#9CA3AF; font-size:10pt; margin-bottom:10px;">(Belum ada jawaban dari siswa)</div>`
+        }
+      })
+
+      bodyHtml += `</div>`
+    })
+
+    const docContent = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+      <head>
+        <meta charset='utf-8'>
+        <title>Hasil Jawaban - ${studentName}</title>
+        <style>
+          body { font-family: 'Calibri', 'Arial', sans-serif; font-size: 11pt; color: #1f2937; line-height: 1.5; margin: 30px; }
+          h1 { font-size: 18pt; color: #007BFF; margin-bottom: 4px; font-weight: bold; }
+          h2 { font-size: 13pt; color: #4B5563; margin-top: 0; margin-bottom: 20px; font-weight: normal; }
+          .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+          .meta-table td { padding: 8px 12px; font-size: 10.5pt; border: 1px solid #D1D5DB; }
+          .meta-label { font-weight: bold; background-color: #F3F4F6; width: 160px; color: #374151; }
+          .footer { font-size: 9pt; color: #9CA3AF; text-align: center; margin-top: 40px; border-top: 1px solid #E5E7EB; padding-top: 12px; }
+        </style>
+      </head>
+      <body>
+        <h1>LEMBAR HASIL JAWABAN MURID</h1>
+        <h2>MathLearn SMP Kelas 8</h2>
+
+        <table class="meta-table">
+          <tr>
+            <td class="meta-label">Nama Murid</td>
+            <td><b>${studentName}</b></td>
+          </tr>
+          <tr>
+            <td class="meta-label">Email</td>
+            <td>${studentEmail}</td>
+          </tr>
+          <tr>
+            <td class="meta-label">Materi Pembelajaran</td>
+            <td><b>${materialTitle}</b></td>
+          </tr>
+          <tr>
+            <td class="meta-label">Tanggal Unduh</td>
+            <td>${dateStr}</td>
+          </tr>
+        </table>
+
+        ${bodyHtml}
+
+        <div class="footer">
+          Dokumen ini dibuat dan diunduh secara otomatis dari Dasbor Guru MathLearn SMP Kelas 8.
+        </div>
+      </body>
+      </html>
+    `
+
+    const blob = new Blob(['\ufeff' + docContent], {
+      type: 'application/msword;charset=utf-8',
+    })
+
+    const cleanName = studentName.replace(/[^a-zA-Z0-9]/g, '_')
+    const fileName = `Hasil_Jawaban_${cleanName}_Pertemuan${selectedMaterialId}.doc`
+
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = fileName
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(link.href)
+  }
+
   // Access Denied View if not teacher
   if (!isTeacher) {
     return (
@@ -429,6 +561,9 @@ export default function TeacherDashboardPage() {
             flexDirection: 'column',
             gap: 16,
             boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+            position: 'sticky',
+            top: 24,
+            maxHeight: 'calc(100vh - 48px)',
           }}
           className="teacher-sidebar no-print"
         >
@@ -517,7 +652,10 @@ export default function TeacherDashboardPage() {
           <div style={{ borderBottom: '1.5px solid var(--color-border)' }} />
 
           {/* Student List */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, overflowY: 'auto', maxHeight: 'calc(100vh - 360px)' }}>
+          <div
+            className="teacher-student-list-scroll"
+            style={{ display: 'flex', flexDirection: 'column', gap: 12, overflowY: 'auto', maxHeight: 'calc(100vh - 360px)', paddingRight: 4 }}
+          >
             {loadingStudents ? (
               <div style={{ display: 'flex', justifyContent: 'center', padding: '24px 0' }}>
                 <CircleNotch className="animate-spin" size={24} color="#007BFF" />
@@ -697,8 +835,8 @@ export default function TeacherDashboardPage() {
                   </p>
                 </div>
 
-                {/* Header Action: Print / PDF Report */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }} className="no-print">
+                {/* Header Action: Word (.docx) Export & Print Report */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }} className="no-print">
                   {filledAnswersCount > 0 && (
                     <span
                       style={{
@@ -718,12 +856,37 @@ export default function TeacherDashboardPage() {
                     </span>
                   )}
                   <button
-                    onClick={handlePrintReport}
+                    onClick={handleExportWord}
+                    title="Unduh berkas Word (.docx / .doc)"
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: 8,
                       padding: '10px 18px',
+                      borderRadius: 12,
+                      backgroundColor: '#007BFF',
+                      border: 'none',
+                      color: '#ffffff',
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 14,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 10px rgba(0, 123, 255, 0.25)',
+                      transition: 'all 150ms',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#0266D2')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#007BFF')}
+                  >
+                    <FileDoc size={18} weight="bold" /> Unduh Word (.docx)
+                  </button>
+                  <button
+                    onClick={handlePrintReport}
+                    title="Cetak atau Simpan PDF via Browser"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      padding: '10px 16px',
                       borderRadius: 12,
                       backgroundColor: 'var(--color-card-bg)',
                       border: '1.5px solid var(--color-border)',
@@ -738,7 +901,7 @@ export default function TeacherDashboardPage() {
                     onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#007BFF')}
                     onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--color-border)')}
                   >
-                    <Printer size={18} color="#007BFF" weight="bold" /> Cetak Hasil Jawaban
+                    <Printer size={18} color="#007BFF" weight="bold" /> Cetak (PDF)
                   </button>
                 </div>
               </div>
@@ -1028,6 +1191,25 @@ export default function TeacherDashboardPage() {
       </div>
 
       <style>{`
+        .teacher-student-list-scroll {
+          scrollbar-width: thin;
+          scrollbar-color: #9CA3AF transparent;
+        }
+        .teacher-student-list-scroll::-webkit-scrollbar {
+          width: 6px;
+        }
+        .teacher-student-list-scroll::-webkit-scrollbar-track {
+          background: transparent;
+          border-radius: 9999px;
+        }
+        .teacher-student-list-scroll::-webkit-scrollbar-thumb {
+          background: #9CA3AF;
+          border-radius: 9999px;
+          transition: background-color 200ms ease;
+        }
+        .teacher-student-list-scroll::-webkit-scrollbar-thumb:hover {
+          background: #E5E7EB;
+        }
         @media (max-width: 768px) {
           .teacher-sidebar { display: none !important; }
         }

@@ -215,6 +215,30 @@ select {
   background: var(--color-neutral);
 }
 
+/* Custom scrollbar for Teacher Dashboard sidebar student list / filter pertemuan */
+.teacher-student-list-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #9CA3AF transparent;
+}
+
+.teacher-student-list-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.teacher-student-list-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 9999px;
+}
+
+.teacher-student-list-scroll::-webkit-scrollbar-thumb {
+  background: #9CA3AF; /* Warna abu-abu */
+  border-radius: 9999px;
+}
+
+.teacher-student-list-scroll::-webkit-scrollbar-thumb:hover {
+  background: #E5E7EB; /* Terang dikit saat di-hover */
+}
+
 /* ============================
    UTILITY CLASSES
    ============================ */
