@@ -123,7 +123,58 @@ export async function downloadStudentFile(fileObj: DownloadFileInfo): Promise<vo
 }
 
 /**
- * Opens / Views student file in a new browser tab
+ * Resolves a valid viewing/preview URL (Signed URL, Blob Object URL, or Public URL)
+ * suitable for embedding in an in-app image/PDF popup modal.
+ */
+export async function getFilePreviewUrl(fileObj: DownloadFileInfo): Promise<string> {
+  if (!fileObj) throw new Error('Informasi berkas tidak ditemukan.')
+
+  // 1. Base64 string
+  if (fileObj.fileData && fileObj.fileData.startsWith('data:')) {
+    return fileObj.fileData
+  }
+
+  let path = fileObj.filePath
+  if (!path && fileObj.fileUrl && fileObj.fileUrl.includes('/materials/')) {
+    path = decodeURIComponent(fileObj.fileUrl.split('/materials/')[1].split('?')[0])
+  }
+
+  // 2. Supabase Storage Signed URL
+  if (supabase && path) {
+    try {
+      const { data: signedData, error } = await supabase.storage
+        .from('materials')
+        .createSignedUrl(path, 3600)
+      if (!error && signedData?.signedUrl) {
+        return signedData.signedUrl
+      }
+    } catch (e) {
+      console.warn('[getFilePreviewUrl] Signed URL fetch exception:', e)
+    }
+
+    // 3. Blob Object URL
+    try {
+      const { data: blobData, error: blobErr } = await supabase.storage
+        .from('materials')
+        .download(path)
+      if (!blobErr && blobData) {
+        return URL.createObjectURL(blobData)
+      }
+    } catch (e) {
+      console.warn('[getFilePreviewUrl] Blob download exception:', e)
+    }
+  }
+
+  // 4. Static or Public URL
+  if (fileObj.fileUrl && fileObj.fileUrl !== '#') {
+    return fileObj.fileUrl
+  }
+
+  throw new Error('Tidak dapat memuat pratinjau berkas.')
+}
+
+/**
+ * Opens / Views student file in a new browser tab (fallback)
  */
 export async function viewStudentFile(fileObj: DownloadFileInfo): Promise<void> {
   if (!fileObj) throw new Error('Informasi berkas tidak ditemukan.')

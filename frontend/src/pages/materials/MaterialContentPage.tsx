@@ -11,7 +11,8 @@ import {
 import { ROUTES } from '@/lib/constants'
 import { getMateriById } from '@/data/materiData'
 import { supabase } from '@/lib/supabase'
-import { downloadStudentFile, viewStudentFile } from '@/lib/fileDownload'
+import { downloadStudentFile } from '@/lib/fileDownload'
+import FilePreviewModal from '@/components/ui/FilePreviewModal'
 import { useMaterialContent } from '@/features/materials/useMaterialContent'
 import { useAuth } from '@/features/auth/AuthContext'
 import { useProgress } from '@/features/progress/useProgress'
@@ -239,6 +240,7 @@ function FileUploadArea({
   const [uploading, setUploading] = useState(false)
 
   const [downloading, setDownloading] = useState(false)
+  const [showPreviewModal, setShowPreviewModal] = useState(false)
 
   let fileObj: { fileName: string; fileSize: number; fileType: string; fileData?: string; fileUrl?: string; filePath?: string } | null = null
   try {
@@ -261,13 +263,9 @@ function FileUploadArea({
     }
   }
 
-  const handleViewUploadedFile = async () => {
+  const handleViewUploadedFile = () => {
     if (!fileObj) return
-    try {
-      await viewStudentFile(fileObj)
-    } catch (err: any) {
-      alert(err.message || 'Gagal membuka berkas.')
-    }
+    setShowPreviewModal(true)
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -535,6 +533,13 @@ function FileUploadArea({
           )}
         </div>
       )}
+
+      {/* In-App File Preview Modal */}
+      <FilePreviewModal
+        isOpen={showPreviewModal}
+        onClose={() => setShowPreviewModal(false)}
+        fileObj={fileObj}
+      />
     </div>
   )
 }

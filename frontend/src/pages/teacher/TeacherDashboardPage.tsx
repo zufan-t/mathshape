@@ -19,8 +19,9 @@ import { supabase } from '@/lib/supabase'
 import { API_URL } from '@/lib/config'
 import { ROUTES } from '@/lib/constants'
 import { MATERI_DATA } from '@/data/materiData'
-import { downloadStudentFile, viewStudentFile } from '@/lib/fileDownload'
+import { downloadStudentFile } from '@/lib/fileDownload'
 import Button from '@/components/ui/Button'
+import FilePreviewModal from '@/components/ui/FilePreviewModal'
 
 interface StudentProfile {
   id: string
@@ -63,6 +64,7 @@ export default function TeacherDashboardPage() {
     return sessionStorage.getItem('teacher_searchQuery') || ''
   })
   const [downloadingKey, setDownloadingKey] = useState<string | null>(null)
+  const [previewFile, setPreviewFile] = useState<any | null>(null)
 
   const handleDownloadFile = async (fileObj: any, key: string) => {
     setDownloadingKey(key)
@@ -75,12 +77,8 @@ export default function TeacherDashboardPage() {
     }
   }
 
-  const handleViewFile = async (fileObj: any) => {
-    try {
-      await viewStudentFile(fileObj)
-    } catch (err: any) {
-      alert(err.message || 'Gagal membuka berkas.')
-    }
+  const handleViewFile = (fileObj: any) => {
+    setPreviewFile(fileObj)
   }
 
   // Sync states to sessionStorage for persistence on refresh
@@ -1227,6 +1225,13 @@ export default function TeacherDashboardPage() {
           )}
         </main>
       </div>
+
+      {/* In-App File Preview Modal */}
+      <FilePreviewModal
+        isOpen={Boolean(previewFile)}
+        onClose={() => setPreviewFile(null)}
+        fileObj={previewFile}
+      />
 
       <style>{`
         .teacher-student-list-scroll {
