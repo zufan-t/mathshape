@@ -5,11 +5,13 @@ import {
   CaretDoubleLeft, CaretLeft, CaretRight, CheckCircle,
   Flag, Info, Crosshair, GraduationCap, MagnifyingGlass,
   YoutubeLogo, SealCheck, X, CircleNotch,
-  UploadSimple, FilePdf, Image, Trash
+  UploadSimple, FilePdf, Image, Trash,
+  Eye, DownloadSimple
 } from '@phosphor-icons/react'
 import { ROUTES } from '@/lib/constants'
 import { getMateriById } from '@/data/materiData'
 import { supabase } from '@/lib/supabase'
+import { downloadStudentFile, viewStudentFile } from '@/lib/fileDownload'
 import { useMaterialContent } from '@/features/materials/useMaterialContent'
 import { useAuth } from '@/features/auth/AuthContext'
 import { useProgress } from '@/features/progress/useProgress'
@@ -236,6 +238,8 @@ function FileUploadArea({
   const [dragging, setDragging] = useState(false)
   const [uploading, setUploading] = useState(false)
 
+  const [downloading, setDownloading] = useState(false)
+
   let fileObj: { fileName: string; fileSize: number; fileType: string; fileData?: string; fileUrl?: string; filePath?: string } | null = null
   try {
     if (value) {
@@ -243,6 +247,27 @@ function FileUploadArea({
     }
   } catch (e) {
     // Treat as raw string
+  }
+
+  const handleDownloadUploadedFile = async () => {
+    if (!fileObj) return
+    setDownloading(true)
+    try {
+      await downloadStudentFile(fileObj)
+    } catch (err: any) {
+      alert(err.message || 'Gagal mengunduh berkas.')
+    } finally {
+      setDownloading(false)
+    }
+  }
+
+  const handleViewUploadedFile = async () => {
+    if (!fileObj) return
+    try {
+      await viewStudentFile(fileObj)
+    } catch (err: any) {
+      alert(err.message || 'Gagal membuka berkas.')
+    }
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -328,8 +353,6 @@ function FileUploadArea({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
   }
 
-  const fileUrl = fileObj ? (fileObj.fileUrl || fileObj.fileData) : ''
-
   return (
     <div style={{ marginTop: 16 }}>
       <label style={{ display: 'block', fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600, color: 'var(--color-text)', marginBottom: 8 }}>
@@ -371,26 +394,62 @@ function FileUploadArea({
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <a
-              href={fileUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              download={fileObj.fileName}
+            <button
+              type="button"
+              onClick={handleViewUploadedFile}
+              title="Buka atau lihat berkas di tab baru"
               style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                fontSize: 13,
+                fontWeight: 600,
+                color: 'var(--color-text)',
+                padding: '6px 12px',
+                borderRadius: 8,
+                backgroundColor: 'var(--color-card-bg)',
+                border: '1.5px solid var(--color-border)',
+                cursor: 'pointer',
+                transition: 'all 200ms',
+              }}
+              onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--color-input-bg)'}
+              onMouseLeave={e => e.currentTarget.style.backgroundColor = 'var(--color-card-bg)'}
+            >
+              <Eye size={16} /> Lihat
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDownloadUploadedFile}
+              disabled={downloading}
+              title="Unduh berkas asli dari Supabase Storage"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
                 fontSize: 13,
                 fontWeight: 600,
                 color: '#007BFF',
-                textDecoration: 'none',
                 padding: '6px 12px',
                 borderRadius: 8,
                 backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                transition: 'background-color 200ms'
+                border: 'none',
+                cursor: downloading ? 'not-allowed' : 'pointer',
+                transition: 'background-color 200ms',
               }}
-              onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(0, 123, 255, 0.2)'}
-              onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(0, 123, 255, 0.1)'}
+              onMouseEnter={e => { if (!downloading) e.currentTarget.style.backgroundColor = 'rgba(0, 123, 255, 0.2)' }}
+              onMouseLeave={e => { if (!downloading) e.currentTarget.style.backgroundColor = 'rgba(0, 123, 255, 0.1)' }}
             >
-              Unduh / Lihat
-            </a>
+              {downloading ? (
+                <>
+                  <CircleNotch size={16} className="animate-spin" /> Mengunduh...
+                </>
+              ) : (
+                <>
+                  <DownloadSimple size={16} weight="bold" /> Unduh
+                </>
+              )}
+            </button>
             {!disabled && (
               <button
                 onClick={handleFileDelete}

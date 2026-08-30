@@ -11,12 +11,15 @@ import {
   CheckCircle,
   Printer,
   FileDoc,
+  DownloadSimple,
+  Eye,
 } from '@phosphor-icons/react'
 import { useAuth } from '@/features/auth/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { API_URL } from '@/lib/config'
 import { ROUTES } from '@/lib/constants'
 import { MATERI_DATA } from '@/data/materiData'
+import { downloadStudentFile, viewStudentFile } from '@/lib/fileDownload'
 import Button from '@/components/ui/Button'
 
 interface StudentProfile {
@@ -177,6 +180,26 @@ export default function TeacherDashboardPage() {
   const [searchQuery, setSearchQuery] = useState(() => {
     return sessionStorage.getItem('teacher_searchQuery') || ''
   })
+  const [downloadingKey, setDownloadingKey] = useState<string | null>(null)
+
+  const handleDownloadFile = async (fileObj: any, key: string) => {
+    setDownloadingKey(key)
+    try {
+      await downloadStudentFile(fileObj)
+    } catch (err: any) {
+      alert(err.message || 'Gagal mengunduh berkas.')
+    } finally {
+      setDownloadingKey(null)
+    }
+  }
+
+  const handleViewFile = async (fileObj: any) => {
+    try {
+      await viewStudentFile(fileObj)
+    } catch (err: any) {
+      alert(err.message || 'Gagal membuka berkas.')
+    }
+  }
 
   // Sync states to sessionStorage for persistence on refresh
   useEffect(() => {
@@ -1130,26 +1153,69 @@ export default function TeacherDashboardPage() {
                                           </span>
                                         </div>
                                       </div>
-                                      <a
-                                        href={fileObj.fileUrl || fileObj.fileData || '#'}
-                                        download={fileObj.fileName}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        style={{
-                                          fontSize: 13,
-                                          fontWeight: 600,
-                                          color: '#007BFF',
-                                          textDecoration: 'none',
-                                          padding: '6px 14px',
-                                          borderRadius: 8,
-                                          backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                                          transition: 'background-color 200ms',
-                                        }}
-                                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(0, 123, 255, 0.2)')}
-                                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(0, 123, 255, 0.1)')}
-                                      >
-                                        Unduh / Buka
-                                      </a>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <button
+                                          type="button"
+                                          onClick={() => handleViewFile(fileObj)}
+                                          title="Buka atau lihat berkas di tab baru"
+                                          style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: 6,
+                                            fontSize: 13,
+                                            fontWeight: 600,
+                                            color: 'var(--color-text)',
+                                            padding: '6px 12px',
+                                            borderRadius: 8,
+                                            backgroundColor: 'var(--color-card-bg)',
+                                            border: '1.5px solid var(--color-border)',
+                                            cursor: 'pointer',
+                                            transition: 'all 200ms',
+                                          }}
+                                          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-input-bg)')}
+                                          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-card-bg)')}
+                                        >
+                                          <Eye size={16} /> Lihat
+                                        </button>
+
+                                        <button
+                                          type="button"
+                                          onClick={() => handleDownloadFile(fileObj, answerKey)}
+                                          disabled={downloadingKey === answerKey}
+                                          title="Unduh berkas asli dari Supabase Storage"
+                                          style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: 6,
+                                            fontSize: 13,
+                                            fontWeight: 600,
+                                            color: '#ffffff',
+                                            padding: '6px 14px',
+                                            borderRadius: 8,
+                                            backgroundColor: '#007BFF',
+                                            border: 'none',
+                                            cursor: downloadingKey === answerKey ? 'not-allowed' : 'pointer',
+                                            opacity: downloadingKey === answerKey ? 0.8 : 1,
+                                            transition: 'background-color 200ms',
+                                          }}
+                                          onMouseEnter={(e) => {
+                                            if (downloadingKey !== answerKey) e.currentTarget.style.backgroundColor = '#0266D2'
+                                          }}
+                                          onMouseLeave={(e) => {
+                                            if (downloadingKey !== answerKey) e.currentTarget.style.backgroundColor = '#007BFF'
+                                          }}
+                                        >
+                                          {downloadingKey === answerKey ? (
+                                            <>
+                                              <CircleNotch size={16} className="animate-spin" /> Mengunduh...
+                                            </>
+                                          ) : (
+                                            <>
+                                              <DownloadSimple size={16} weight="bold" /> Unduh
+                                            </>
+                                          )}
+                                        </button>
+                                      </div>
                                     </div>
 
                                     {/* Image Preview if available */}

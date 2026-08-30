@@ -84,3 +84,43 @@ CREATE POLICY "Allow upsert for users on their own profile"
     TO authenticated
     USING (auth.uid() = id)
     WITH CHECK (auth.uid() = id);
+
+-- ============================================================
+-- 7. Supabase Storage: Bucket & Storage Policies for 'materials'
+-- ============================================================
+
+-- Create the storage bucket 'materials' if it does not exist (public for direct viewing)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('materials', 'materials', true)
+ON CONFLICT (id) DO UPDATE SET public = true;
+
+-- Drop existing storage policies for 'materials' to prevent duplicates
+DROP POLICY IF EXISTS "Public Access Materials" ON storage.objects;
+DROP POLICY IF EXISTS "Allow authenticated upload to materials" ON storage.objects;
+DROP POLICY IF EXISTS "Allow read access to materials" ON storage.objects;
+DROP POLICY IF EXISTS "Allow user update own materials" ON storage.objects;
+DROP POLICY IF EXISTS "Allow user delete own materials" ON storage.objects;
+
+-- Allow public and authenticated users (teachers, students) to view/download files
+CREATE POLICY "Allow read access to materials"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'materials');
+
+-- Allow authenticated users (students & teachers) to upload files into 'materials'
+CREATE POLICY "Allow authenticated upload to materials"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (bucket_id = 'materials');
+
+-- Allow users to update their own files in 'materials'
+CREATE POLICY "Allow user update own materials"
+ON storage.objects FOR UPDATE
+TO authenticated
+USING (bucket_id = 'materials' AND auth.uid() = owner);
+
+-- Allow users to delete their own files in 'materials'
+CREATE POLICY "Allow user delete own materials"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (bucket_id = 'materials' AND auth.uid() = owner);
+
