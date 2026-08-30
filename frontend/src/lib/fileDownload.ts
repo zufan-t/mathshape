@@ -78,8 +78,8 @@ export async function downloadStudentFile(fileObj: DownloadFileInfo): Promise<vo
     }
   }
 
-  // Method 3: Direct fetch via public URL
-  if (!blob && fileObj.fileUrl && fileObj.fileUrl !== '#' && fileObj.fileUrl.startsWith('http')) {
+  // Method 3: Direct fetch via public or relative URL (e.g. /files/... or https://...)
+  if (!blob && fileObj.fileUrl && fileObj.fileUrl !== '#') {
     try {
       const res = await fetch(fileObj.fileUrl)
       if (res.ok) {
@@ -98,7 +98,7 @@ export async function downloadStudentFile(fileObj: DownloadFileInfo): Promise<vo
     if (blob.type.includes('html')) {
       const text = await blob.text()
       if (text.includes('<!doctype html>') || text.includes('<html') || text.includes('Error') || text.includes('Unauthorized')) {
-        throw new Error('Gagal mengunduh: Server mengembalikan respons HTML alih-alih berkas PDF. Pastikan bucket "materials" di Supabase sudah aktif dan memiliki izin baca (Storage Policy).')
+        throw new Error('Gagal mengunduh: Server mengembalikan respons HTML alih-alih berkas PDF. Pastikan berkas tersedia di Supabase Storage.')
       }
     }
 
@@ -114,12 +114,12 @@ export async function downloadStudentFile(fileObj: DownloadFileInfo): Promise<vo
   }
 
   // Fallback: If Blob cannot be retrieved due to browser cross-origin policy, open URL directly
-  if (fileObj.fileUrl && fileObj.fileUrl !== '#' && fileObj.fileUrl.startsWith('http')) {
+  if (fileObj.fileUrl && fileObj.fileUrl !== '#') {
     window.open(fileObj.fileUrl, '_blank')
     return
   }
 
-  throw new Error('Berkas tidak dapat diunduh dari Supabase Storage. Pastikan berkas sudah terunggah dan izin akses bucket telah dikonfigurasi.')
+  throw new Error('Berkas tidak dapat diunduh dari server. Pastikan berkas sudah terunggah.')
 }
 
 /**
@@ -170,7 +170,7 @@ export async function viewStudentFile(fileObj: DownloadFileInfo): Promise<void> 
     }
   }
 
-  if (fileObj.fileUrl && fileObj.fileUrl !== '#' && fileObj.fileUrl.startsWith('http')) {
+  if (fileObj.fileUrl && fileObj.fileUrl !== '#') {
     window.open(fileObj.fileUrl, '_blank')
     return
   }
