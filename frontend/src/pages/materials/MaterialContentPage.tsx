@@ -1167,25 +1167,48 @@ export default function MaterialContentPage() {
     if (isMobile) setSidebarOpen(false)
   }, [isMobile])
 
-  // Load answers from backend when mounting or material changes
+  // Load answers from Supabase / backend when mounting or material changes
   useEffect(() => {
-    if (!user || !session || !materialId) return
+    const currentUserId = user?.id
+    if (!currentUserId || !materialId) return
 
     async function fetchAnswers() {
       setLoadingAnswers(true)
       try {
-        const response = await fetch(`${API_URL}/answers?materialId=${materialId}`, {
-          headers: {
-            'Authorization': `Bearer ${session?.access_token}`
+        // 1. Ambil langsung dari Supabase Database (Utama)
+        if (supabase) {
+          const { data: sbData, error: sbError } = await supabase
+            .from('user_answers')
+            .select('section_index, question_index, answer_text')
+            .eq('material_id', materialId)
+            .eq('user_id', currentUserId)
+
+          if (!sbError && sbData && sbData.length > 0) {
+            const loadedAnswers: Record<string, string> = {}
+            sbData.forEach((ans: { section_index: number; question_index: number; answer_text: string }) => {
+              loadedAnswers[`${ans.section_index}_${ans.question_index}`] = ans.answer_text
+            })
+            setAnswers(loadedAnswers)
+            setLoadingAnswers(false)
+            return
           }
-        })
-        if (response.ok) {
-          const data = await response.json()
-          const loadedAnswers: Record<string, string> = {}
-          data.forEach((ans: { section_index: number; question_index: number; answer_text: string }) => {
-            loadedAnswers[`${ans.section_index}_${ans.question_index}`] = ans.answer_text
+        }
+
+        // 2. Fallback jika ada server backend Express
+        if (session?.access_token) {
+          const response = await fetch(`${API_URL}/answers?materialId=${materialId}`, {
+            headers: {
+              'Authorization': `Bearer ${session?.access_token}`
+            }
           })
-          setAnswers(loadedAnswers)
+          if (response.ok) {
+            const data = await response.json()
+            const loadedAnswers: Record<string, string> = {}
+            data.forEach((ans: { section_index: number; question_index: number; answer_text: string }) => {
+              loadedAnswers[`${ans.section_index}_${ans.question_index}`] = ans.answer_text
+            })
+            setAnswers(loadedAnswers)
+          }
         }
       } catch (err) {
         console.error('[MaterialContentPage] Error fetching answers:', err)
@@ -1215,7 +1238,8 @@ export default function MaterialContentPage() {
   }, [progressLoading, progressRestored, getProgressByMaterialId, materialId])
 
   const saveAnswersForSection = async (sectionIndex: number) => {
-    if (!user || !session) return
+    const currentUserId = user?.id
+    if (!currentUserId) return
 
     // Find all answers associated with this sectionIndex
     const sectionAnswers = Object.entries(answers)
@@ -1232,17 +1256,44 @@ export default function MaterialContentPage() {
 
     if (sectionAnswers.length === 0) return
 
+    // 1. Simpan langsung ke Supabase user_answers (Utama)
+    if (supabase) {
+      const payload = sectionAnswers.map(ans => ({
+        user_id: currentUserId,
+        material_id: ans.materialId,
+        section_index: ans.sectionIndex,
+        question_index: ans.questionIndex,
+        answer_text: ans.answerText || '',
+        updated_at: new Date().toISOString()
+      }))
+
+      try {
+        const { error: sbError } = await supabase
+          .from('user_answers')
+          .upsert(payload, { onConflict: 'user_id,material_id,section_index,question_index' })
+
+        if (sbError) {
+          console.warn('[MaterialContentPage] Supabase upsert error:', sbError.message)
+        }
+      } catch (sbErr) {
+        console.warn('[MaterialContentPage] Supabase upsert exception:', sbErr)
+      }
+    }
+
+    // 2. Fallback backend Express
     try {
-      await fetch(`${API_URL}/answers`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`
-        },
-        body: JSON.stringify({ answers: sectionAnswers })
-      })
+      if (session?.access_token) {
+        await fetch(`${API_URL}/answers`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.access_token}`
+          },
+          body: JSON.stringify({ answers: sectionAnswers })
+        })
+      }
     } catch (err) {
-      console.error(`[MaterialContentPage] Error saving answers for section ${sectionIndex}:`, err)
+      // ignore
     }
   }
 
