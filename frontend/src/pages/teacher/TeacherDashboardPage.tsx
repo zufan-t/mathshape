@@ -229,26 +229,90 @@ export default function TeacherDashboardPage() {
     }
   }, [user, authLoading, navigate])
 
-  // Fetch all students (profiles where role = 'student')
+  // Fetch all students (from profiles, user_answers, and storage bucket)
   useEffect(() => {
     if (!isTeacher) return
 
     async function fetchStudents() {
       setLoadingStudents(true)
       try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('id, full_name, email, role')
-          .eq('role', 'student')
-          .order('full_name', { ascending: true })
+        const studentMap = new Map<string, StudentProfile>()
 
-        if (error) {
-          console.warn('Error fetching real students from Supabase:', error.message)
+        // 1. Fetch from profiles table in Supabase
+        if (supabase) {
+          const { data: profilesData, error: profileErr } = await supabase
+            .from('profiles')
+            .select('id, full_name, email, role')
+            .order('full_name', { ascending: true })
+
+          if (!profileErr && profilesData) {
+            profilesData.forEach((p: { id: string; full_name: string; email: string; role: string }) => {
+              if (p.id !== user?.id && p.role !== 'teacher') {
+                studentMap.set(p.id, {
+                  id: p.id,
+                  full_name: p.full_name || p.email?.split('@')[0] || 'Siswa',
+                  email: p.email || '',
+                  role: p.role || 'student',
+                  isMock: false,
+                })
+              }
+            })
+          }
         }
 
-        const realStudents = (data || []).map((s: { id: string; full_name: string; email: string; role: string }) => ({ ...s, isMock: false }))
+        // 2. Discover distinct student IDs from user_answers table
+        if (supabase) {
+          try {
+            const { data: ansData } = await supabase
+              .from('user_answers')
+              .select('user_id')
 
-        // Combine real students with mock demo students (filtering out duplicates by ID)
+            if (ansData && ansData.length > 0) {
+              ansData.forEach((row: { user_id: string }) => {
+                if (row.user_id && row.user_id !== user?.id && !studentMap.has(row.user_id)) {
+                  studentMap.set(row.user_id, {
+                    id: row.user_id,
+                    full_name: `Siswa (${row.user_id.substring(0, 8)})`,
+                    email: '',
+                    role: 'student',
+                    isMock: false,
+                  })
+                }
+              })
+            }
+          } catch (e) {
+            console.warn('user_answers student scan warning:', e)
+          }
+        }
+
+        // 3. Scan Supabase Storage 'materials' bucket for student folders
+        if (supabase) {
+          try {
+            const { data: storageFolders } = await supabase.storage
+              .from('materials')
+              .list()
+
+            if (storageFolders && storageFolders.length > 0) {
+              storageFolders.forEach((folder: any) => {
+                if (folder.name && folder.name.length >= 10 && folder.name !== user?.id && !studentMap.has(folder.name)) {
+                  studentMap.set(folder.name, {
+                    id: folder.name,
+                    full_name: `Siswa (${folder.name.substring(0, 8)})`,
+                    email: '',
+                    role: 'student',
+                    isMock: false,
+                  })
+                }
+              })
+            }
+          } catch (e) {
+            console.warn('storage student scan warning:', e)
+          }
+        }
+
+        const realStudents = Array.from(studentMap.values())
+
+        // Combine: Real students first, then mock demo students
         const combined = [...realStudents]
         DEFAULT_MOCK_STUDENTS.forEach((mock) => {
           if (!combined.some((s) => s.id === mock.id)) {
@@ -257,6 +321,18 @@ export default function TeacherDashboardPage() {
         })
 
         setStudents(combined)
+
+        // If there are real students, automatically select the first real student!
+        if (realStudents.length > 0) {
+          setSelectedStudentId((prev) => {
+            if (!prev || prev.startsWith('mock-')) {
+              return realStudents[0].id
+            }
+            return prev
+          })
+        } else if (!selectedStudentId) {
+          setSelectedStudentId('mock-1')
+        }
       } catch (err) {
         console.error('Error fetching students:', err)
         setStudents(DEFAULT_MOCK_STUDENTS)
@@ -266,17 +342,18 @@ export default function TeacherDashboardPage() {
     }
 
     fetchStudents()
-  }, [isTeacher])
+  }, [isTeacher, user?.id])
 
   // Fetch answers for selected student + material
   useEffect(() => {
     if (!selectedStudentId || !selectedMaterialId) return
 
-    const selectedStudent = students.find((s) => s.id === selectedStudentId)
+    const currentStudentId = selectedStudentId
+    const selectedStudent = students.find((s) => s.id === currentStudentId)
 
     // Handle Mock Student answers
-    if (selectedStudent?.isMock || selectedStudentId.startsWith('mock-')) {
-      const mockSet = MOCK_ANSWERS[selectedStudentId] || {}
+    if (selectedStudent?.isMock || currentStudentId.startsWith('mock-')) {
+      const mockSet = MOCK_ANSWERS[currentStudentId] || {}
       const answersMap: Record<string, string> = {}
       const prefix = `p${selectedMaterialId}_`
 
@@ -292,51 +369,96 @@ export default function TeacherDashboardPage() {
       return
     }
 
-    // Handle Real Student answers (Fetch from Supabase or Backend API)
+    // Handle Real Student answers (Fetch from Supabase DB + Scan Storage Bucket)
     async function fetchStudentAnswers() {
       setLoadingAnswers(true)
+      const answersMap: Record<string, string> = {}
+
       try {
-        // Try Supabase directly first
-        const { data: dbData, error: dbError } = await supabase
-          .from('user_answers')
-          .select('section_index, question_index, answer_text')
-          .eq('material_id', selectedMaterialId)
-          .eq('user_id', selectedStudentId)
+        // Step 1: Query Supabase Database table 'user_answers'
+        if (supabase) {
+          const { data: dbData, error: dbError } = await supabase
+            .from('user_answers')
+            .select('section_index, question_index, answer_text')
+            .eq('material_id', selectedMaterialId)
+            .eq('user_id', currentStudentId)
 
-        if (!dbError && dbData && dbData.length > 0) {
-          const answersMap: Record<string, string> = {}
-          dbData.forEach((ans: AnswerRow) => {
-            answersMap[`${ans.section_index}_${ans.question_index}`] = ans.answer_text
-          })
-          setAnswers(answersMap)
-          setLoadingAnswers(false)
-          return
-        }
-
-        // Fallback to Express backend API if token is available
-        if (session?.access_token) {
-          const response = await fetch(
-            `${API_URL}/answers?materialId=${selectedMaterialId}&userId=${selectedStudentId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${session.access_token}`,
-              },
-            }
-          )
-
-          if (response.ok) {
-            const apiData: AnswerRow[] = await response.json()
-            const answersMap: Record<string, string> = {}
-            apiData.forEach((ans) => {
+          if (!dbError && dbData && dbData.length > 0) {
+            dbData.forEach((ans: AnswerRow) => {
               answersMap[`${ans.section_index}_${ans.question_index}`] = ans.answer_text
             })
-            setAnswers(answersMap)
-            setLoadingAnswers(false)
-            return
           }
         }
 
-        setAnswers({})
+        // Step 2: Direct scan in Supabase Storage bucket 'materials' for this student & material
+        if (supabase && !currentStudentId.startsWith('mock-')) {
+          try {
+            const { data: secList } = await supabase.storage
+              .from('materials')
+              .list(`${selectedStudentId}/${selectedMaterialId}`)
+
+            if (secList && secList.length > 0) {
+              for (const item of secList) {
+                const secNum = parseInt(item.name)
+                if (!isNaN(secNum)) {
+                  const { data: fileList } = await supabase.storage
+                    .from('materials')
+                    .list(`${selectedStudentId}/${selectedMaterialId}/${item.name}`)
+
+                  if (fileList && fileList.length > 0) {
+                    const sortedFiles = [...fileList].sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''))
+                    const targetFile = sortedFiles[0]
+                    const filePath = `${selectedStudentId}/${selectedMaterialId}/${item.name}/${targetFile.name}`
+                    const { data: urlData } = supabase.storage.from('materials').getPublicUrl(filePath)
+
+                    let qIdx = 0
+                    if (secNum === 6 && selectedMaterialId === 1) qIdx = 3
+                    if (secNum === 8) {
+                      qIdx = selectedMaterialId === 2 ? 4 : 3
+                    }
+
+                    const fileKey = `${secNum}_${qIdx}`
+                    if (!answersMap[fileKey] || !answersMap[fileKey].includes('filePath')) {
+                      answersMap[fileKey] = JSON.stringify({
+                        fileName: targetFile.name.replace(/^\d+_/, ''),
+                        fileSize: targetFile.metadata?.size || 0,
+                        fileType: targetFile.metadata?.mimetype || 'application/pdf',
+                        fileUrl: urlData.publicUrl,
+                        filePath: filePath,
+                      })
+                    }
+                  }
+                }
+              }
+            }
+          } catch (storageScanErr) {
+            console.warn('[TeacherDashboard] Storage scan error:', storageScanErr)
+          }
+        }
+
+        // Step 3: Fallback to Express backend if needed
+        if (Object.keys(answersMap).length === 0 && session?.access_token) {
+          try {
+            const response = await fetch(
+              `${API_URL}/answers?materialId=${selectedMaterialId}&userId=${selectedStudentId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${session.access_token}`,
+                },
+              }
+            )
+            if (response.ok) {
+              const apiData: AnswerRow[] = await response.json()
+              apiData.forEach((ans) => {
+                answersMap[`${ans.section_index}_${ans.question_index}`] = ans.answer_text
+              })
+            }
+          } catch (e) {
+            // ignore
+          }
+        }
+
+        setAnswers(answersMap)
       } catch (err) {
         console.error('Error fetching student answers:', err)
         setAnswers({})
@@ -716,12 +838,19 @@ export default function TeacherDashboardPage() {
                       <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {s.full_name}
                       </span>
-                      {s.isMock && (
+                      {s.isMock ? (
                         <span
-                          title="Siswa telah menyelesaikan tugas"
-                          style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 600, color: '#10B981', backgroundColor: 'rgba(16, 185, 129, 0.1)', padding: '2px 8px', borderRadius: 9999 }}
+                          title="Data simulasi contoh"
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 600, color: '#6B7280', backgroundColor: 'var(--color-input-bg)', padding: '2px 8px', borderRadius: 9999 }}
                         >
-                          <CheckCircle size={12} weight="fill" /> Selesai
+                          Demo
+                        </span>
+                      ) : (
+                        <span
+                          title="Siswa terdaftar di Supabase"
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 700, color: '#007BFF', backgroundColor: 'rgba(0, 123, 255, 0.1)', padding: '2px 8px', borderRadius: 9999 }}
+                        >
+                          <CheckCircle size={12} weight="fill" /> Siswa
                         </span>
                       )}
                     </button>
@@ -787,7 +916,9 @@ export default function TeacherDashboardPage() {
                                 }}
                               >
                                 <span>{s.full_name}</span>
-                                {s.isMock && (
+                                {s.isMock ? (
+                                  <span style={{ fontSize: 10, color: '#9CA3AF' }}>Demo</span>
+                                ) : (
                                   <CheckCircle size={14} color="#10B981" weight="fill" />
                                 )}
                               </button>
