@@ -312,16 +312,20 @@ export default function TeacherDashboardPage() {
 
         const realStudents = Array.from(studentMap.values())
 
-        // If real students exist in Supabase, show ONLY real students!
-        // If no real students exist yet, show demo mock students as a preview.
-        const finalStudents = realStudents.length > 0 ? realStudents : DEFAULT_MOCK_STUDENTS
+        // Combine: Real students first, then mock demo students
+        const combined = [...realStudents]
+        DEFAULT_MOCK_STUDENTS.forEach((mock) => {
+          if (!combined.some((s) => s.id === mock.id)) {
+            combined.push(mock)
+          }
+        })
 
-        setStudents(finalStudents)
+        setStudents(combined)
 
-        // If there are real students, automatically select the first real student!
+        // Automatically select the first real student if available and none selected yet
         if (realStudents.length > 0) {
           setSelectedStudentId((prev) => {
-            if (!prev || prev.startsWith('mock-') || !realStudents.some(s => s.id === prev)) {
+            if (!prev || !combined.some(s => s.id === prev)) {
               return realStudents[0].id
             }
             return prev
