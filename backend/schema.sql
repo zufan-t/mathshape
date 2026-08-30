@@ -32,6 +32,8 @@ ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 -- 4. Drop Existing Policies (to prevent duplicates)
 DROP POLICY IF EXISTS "Users can view their own answers" ON public.user_answers;
+DROP POLICY IF EXISTS "Users and teachers can view answers" ON public.user_answers;
+DROP POLICY IF EXISTS "Allow select answers for authenticated" ON public.user_answers;
 DROP POLICY IF EXISTS "Users can insert their own answers" ON public.user_answers;
 DROP POLICY IF EXISTS "Users can update their own answers" ON public.user_answers;
 DROP POLICY IF EXISTS "Users can delete their own answers" ON public.user_answers;
@@ -39,38 +41,36 @@ DROP POLICY IF EXISTS "Allow select for all authenticated users" ON public.profi
 DROP POLICY IF EXISTS "Allow upsert for users on their own profile" ON public.profiles;
 
 -- 5. Create RLS Policies for user_answers
--- Users can view their own answers, and teachers can view all answers
-CREATE POLICY "Users and teachers can view answers" 
+-- Allow all authenticated users (teachers & students) to read answers
+CREATE POLICY "Allow select answers for authenticated" 
     ON public.user_answers 
     FOR SELECT 
-    USING (
-        auth.uid() = user_id OR 
-        EXISTS (
-            SELECT 1 FROM public.profiles 
-            WHERE id = auth.uid() AND role = 'teacher'
-        )
-    );
+    TO authenticated
+    USING (true);
 
 -- Users can insert their own answers
 CREATE POLICY "Users can insert their own answers" 
     ON public.user_answers 
     FOR INSERT 
+    TO authenticated
     WITH CHECK (auth.uid() = user_id);
 
 -- Users can update their own answers
 CREATE POLICY "Users can update their own answers" 
     ON public.user_answers 
     FOR UPDATE 
+    TO authenticated
     USING (auth.uid() = user_id);
 
 -- Users can delete their own answers
 CREATE POLICY "Users can delete their own answers" 
     ON public.user_answers 
     FOR DELETE 
+    TO authenticated
     USING (auth.uid() = user_id);
 
 -- 6. Create RLS Policies for profiles
--- All authenticated users can view profiles
+-- All authenticated users can view profiles (to see student names on dashboard)
 CREATE POLICY "Allow select for all authenticated users"
     ON public.profiles
     FOR SELECT
@@ -84,6 +84,48 @@ CREATE POLICY "Allow upsert for users on their own profile"
     TO authenticated
     USING (auth.uid() = id)
     WITH CHECK (auth.uid() = id);
+
+-- ============================================================
+-- 6b. Automatic User Profile Trigger & Backfill
+-- ============================================================
+
+-- Function to handle new registered user
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, full_name, email, role)
+  VALUES (
+    NEW.id,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email, '@', 1)),
+    COALESCE(NEW.email, ''),
+    COALESCE(NEW.raw_user_meta_data->>'role', 'student')
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    full_name = EXCLUDED.full_name,
+    email = EXCLUDED.email,
+    role = EXCLUDED.role;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger on auth.users
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT OR UPDATE ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- Backfill existing registered users into public.profiles
+INSERT INTO public.profiles (id, full_name, email, role)
+SELECT 
+  id,
+  COALESCE(raw_user_meta_data->>'full_name', split_part(email, '@', 1)),
+  COALESCE(email, ''),
+  COALESCE(raw_user_meta_data->>'role', 'student')
+FROM auth.users
+ON CONFLICT (id) DO UPDATE SET
+  full_name = EXCLUDED.full_name,
+  email = EXCLUDED.email,
+  role = EXCLUDED.role;
 
 -- ============================================================
 -- 7. Supabase Storage: Bucket & Storage Policies for 'materials'

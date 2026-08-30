@@ -312,20 +312,16 @@ export default function TeacherDashboardPage() {
 
         const realStudents = Array.from(studentMap.values())
 
-        // Combine: Real students first, then mock demo students
-        const combined = [...realStudents]
-        DEFAULT_MOCK_STUDENTS.forEach((mock) => {
-          if (!combined.some((s) => s.id === mock.id)) {
-            combined.push(mock)
-          }
-        })
+        // If real students exist in Supabase, show ONLY real students!
+        // If no real students exist yet, show demo mock students as a preview.
+        const finalStudents = realStudents.length > 0 ? realStudents : DEFAULT_MOCK_STUDENTS
 
-        setStudents(combined)
+        setStudents(finalStudents)
 
         // If there are real students, automatically select the first real student!
         if (realStudents.length > 0) {
           setSelectedStudentId((prev) => {
-            if (!prev || prev.startsWith('mock-')) {
+            if (!prev || prev.startsWith('mock-') || !realStudents.some(s => s.id === prev)) {
               return realStudents[0].id
             }
             return prev
@@ -395,7 +391,7 @@ export default function TeacherDashboardPage() {
           try {
             const { data: secList } = await supabase.storage
               .from('materials')
-              .list(`${selectedStudentId}/${selectedMaterialId}`)
+              .list(`${currentStudentId}/${selectedMaterialId}`)
 
             if (secList && secList.length > 0) {
               for (const item of secList) {
@@ -403,12 +399,12 @@ export default function TeacherDashboardPage() {
                 if (!isNaN(secNum)) {
                   const { data: fileList } = await supabase.storage
                     .from('materials')
-                    .list(`${selectedStudentId}/${selectedMaterialId}/${item.name}`)
+                    .list(`${currentStudentId}/${selectedMaterialId}/${item.name}`)
 
                   if (fileList && fileList.length > 0) {
                     const sortedFiles = [...fileList].sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''))
                     const targetFile = sortedFiles[0]
-                    const filePath = `${selectedStudentId}/${selectedMaterialId}/${item.name}/${targetFile.name}`
+                    const filePath = `${currentStudentId}/${selectedMaterialId}/${item.name}/${targetFile.name}`
                     const { data: urlData } = supabase.storage.from('materials').getPublicUrl(filePath)
 
                     let qIdx = 0
@@ -440,7 +436,7 @@ export default function TeacherDashboardPage() {
         if (Object.keys(answersMap).length === 0 && session?.access_token) {
           try {
             const response = await fetch(
-              `${API_URL}/answers?materialId=${selectedMaterialId}&userId=${selectedStudentId}`,
+              `${API_URL}/answers?materialId=${selectedMaterialId}&userId=${currentStudentId}`,
               {
                 headers: {
                   Authorization: `Bearer ${session.access_token}`,
